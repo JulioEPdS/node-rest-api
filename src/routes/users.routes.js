@@ -1,12 +1,12 @@
 import {Router} from 'express'
-import cors from 'cors'
-import {postLogin} from '../controllers/users.controller'
+import {postLogin, postSignup} from '../controllers/users.controller'
 
 const router = Router()
 
-//router.post('/signup', cors(corsOptions), algunaruta)
 
 router.post('/login', postLogin)
+
+router.post('/signup', postSignup)
 
 
 export default router

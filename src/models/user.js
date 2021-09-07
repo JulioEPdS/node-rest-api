@@ -1,23 +1,7 @@
 import { DataTypes, Sequelize } from "sequelize";
-import config from '../config'
+import sequelize from '../database/connection'
 
-const dbSettings ={
-    user: config.dbUser,
-    password: config.dbPassword,
-    server: config.dbServer,
-    database: config.dbDatabase,
-    options: {
-        encrypt: true, // for azure
-        trustServerCertificate: true // change to true for local dev / self-signed certs
-    }
-}
-
-const sequelize = new Sequelize(dbSettings.database, dbSettings.user, dbSettings.password, {
-    host: 'localhost',
-    dialect: 'mssql' 
-})
-
-const User = sequelize.define('User', {
+const Usuarios = sequelize.define('Usuarios', {
   // Model attributes are defined here
   user: {
     type: DataTypes.STRING,
@@ -28,11 +12,12 @@ const User = sequelize.define('User', {
     allowNull: false
   },
   description: {
-    type: DataTypes.STRING
+    type: DataTypes.STRING,
+    defaultValue: 'No description'
   },
   register_date:{
       type: DataTypes.DATE,
-      defaultValue: Sequelize.NOW
+      defaultValue: Sequelize.literal('SYSDATETIME()')
   },
   privileges:{
       type: DataTypes.INTEGER,
@@ -41,5 +26,5 @@ const User = sequelize.define('User', {
 }  // Other model options go here inside ,{ }
 );
 
-export default User
+export default Usuarios
 

@@ -1,19 +1,35 @@
-import sql from 'mssql'
 import config from '../config'
+import Sequelize from 'sequelize' //Importing the connection
 
-import Sequelize from 'sequelize'
+//Conection using ORM sequelize
+const sequelize = new Sequelize(config.dbDatabase, config.dbUser, config.dbPassword, {
+    host: 'localhost',
+    dialect: 'mssql',
+    timezone: '-05:00' //ADJUSTED FOR TIME OFFSET OF THE SERVER, remove if server has correct stamptime 
+    /* run SELECT SYSDATETIME()  
+    ,SYSDATETIMEOFFSET()  
+    ,SYSUTCDATETIME()  
+    ,CURRENT_TIMESTAMP  
+    ,GETDATE()  
+    ,GETUTCDATE(); to verify */
+})
 
-const dbSettings ={
+export default sequelize
+
+
+
+//TO USE MSSQL LIBRARY AND COMMUNICATE DIRECTLY
+/*const dbSettings ={
     user: config.dbUser,
     password: config.dbPassword,
     server: config.dbServer,
     database: config.dbDatabase,
-    options: {
-        encrypt: true, // for azure
-        trustServerCertificate: true // change to true for local dev / self-signed certs
-    }
+    //options: {
+      //  encrypt: true, // for azure
+      //  trustServerCertificate: true // change to true for local dev / self-signed certs
+    //}
 }
-/*
+
 export async function getConnection(){
     try{
         const pool = await sql.connect(dbSettings)
@@ -24,18 +40,3 @@ export async function getConnection(){
 }
 
 export {sql} */
-
-export async function getConnection(){
-    const sequelize = new Sequelize(dbSettings.database, dbSettings.user, dbSettings.password, {
-        host: 'localhost',
-        dialect: 'mssql' 
-      })
-
-    try {
-        await sequelize.authenticate();
-        console.log('Connection has been established successfully.');
-      } catch (error) {
-        console.error('Unable to connect to the database:', error);
-      }
-}
-

@@ -1,79 +1,114 @@
-import { DataTypes, Sequelize } from "sequelize";
+import User from '../models/user'
 import config from '../config'
+import bcrypt from 'bcrypt'
+import jwt from 'jsonwebtoken'
 
-const dbSettings ={
-    user: config.dbUser,
-    password: config.dbPassword,
-    server: config.dbServer,
-    database: config.dbDatabase,
-    options: {
-        encrypt: true, // for azure
-        trustServerCertificate: true // change to true for local dev / self-signed certs
-    }
-}
 
-const sequelize = new Sequelize(dbSettings.database, dbSettings.user, dbSettings.password, {
-    host: 'localhost',
-    dialect: 'mssql' 
-})
-
-const User = sequelize.define('User', {
-  // Model attributes are defined here
-  user: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  credential: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  description: {
-    type: DataTypes.STRING
-  },
-  register_date:{
-      type: DataTypes.DATE,
-      defaultValue: Sequelize.NOW
-  },
-  privileges:{
-      type: DataTypes.INTEGER,
-      defaultValue: 9
-  }
-}  // Other model options go here inside ,{ }
-)
-
+//CODE FOR HANDLING THE LOGIN REQUESTS ############################################################
 export const postLogin = async (req,res) => {
-    const {user, password} = req.body
-
-    if(user == null || password==null){
-        return res.status(400).json({msg:"Bad request. Porfavor llene todos los campos"})
-    }
-
-    try{
-        const user = User.build({
-            user:"julius", 
-            password:"PassMe1321", 
-            description:'Test user'
+    //Validating the req returned values for user and credential
+    if(req?.user !== null && req?.password !== null){
+        User.findOne({where:{
+            user: req.body?.user
+        }})
+        .then(user => {
+            if(user === null){
+                //USER DOESN'T EXIST 
+                //cancel the operation
+                return res.status(401).json({
+                    message: 'Verificación fallida'
+                })               
+            } 
+            
+            //USER EXISTS 
+            //SO... VERIFY PASSWORD HASH COMPARE            
+            bcrypt.compare(req.body.password, user.credential, (err,result) => {
+                if(err){
+                    return res.status(401).json({
+                        message: 'Verificación fallida'
+                    })
+                }
+                if(result){
+                    //mail and password matched
+                    //GENERATE TOKEN USING JWT
+                    const token = jwt.sign({
+                        email: user.user,
+                        userId: user.id
+                    }, 
+                    config.jwtKey,
+                    {
+                        expiresIn: "1h"
+                    })//JWT SIGN
+                    //If point reached, correct credentials
+                    return res.status(200).json({
+                        message: 'Credenciales verificadas',
+                        token: token
+                    })
+                }
+                res.status(401).json({
+                    message: 'Verificación fallida'
+                })
+            })//bcrypt
         })
-        console.log(user instanceof User)
-
-        /*await pool.request()
-            .input("User", sql.NVarChar, user)
-            .input("Credential", sql.NVarChar, password)
-            .execute('credentialverification')
-            .then(result => {
-                const verification = result.recordsets[0]
-                if(verification == null){
-                    res.status(401).json({msg:"Validación fallida"})
-                }
-                else{
-                    
-                    res.status(201).json({msg:'Validado'})
-                    console.dir(verification)
-                }
-
-            })*/
-        
-               
-    }catch(error){console.log(error)}
-    
+        .catch(err => {
+            console.log(err)
+            res.status(500).json({
+                error: err
+            })
+        })
+                      
+    } else { //CAMPOS INCOMPLETOS
+        return res.status(400).json({
+            msg:"Bad request. Porfavor llene todos los campos"
+        })
+    }
 }
+
+//CODE FOR HANDLING THE SIGNUP REQUESTS ############################################################
+export const postSignup = async (req,res) => {
+    User.findOne({where:{
+        user: req.body?.user
+    }})
+    .then(user => {
+        //Verify if mail is in use
+        if(user !== null){
+            return res.status(409).json({
+                message: 'El usuario no se encuentra disponible'
+            })
+        } 
+        //Inits hash proces to store the password securely
+        bcrypt.hash(req.body?.password, 10, (err, hash) => {
+            if(err) {
+                //Failed to hash, operation dropped
+                return res.status(500).json({
+                    error: err
+                })
+            }
+            //Hash successful
+            //Create and insert data received
+            User.create({        
+                user: req.body?.user,
+                credential: hash,
+                description: req.body?.description,
+                privileges: req.body?.privileges,  
+            })
+            .then( result => {
+                res.status(201).json({
+                message: 'Usuario registrado con éxito'
+                })
+            })
+            .catch(err => {
+                console.log(err)
+                res.status(500).json({
+                error: err
+                })
+            })
+        
+        })            
+    })
+    .catch(err => {
+        console.log(err)
+        res.status(500).json({
+            error: err})
+    }
+)}
