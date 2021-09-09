@@ -22,7 +22,7 @@ export const postLogin = async (req,res) => {
             
             //USER EXISTS 
             //SO... VERIFY PASSWORD HASH COMPARE            
-            bcrypt.compare(req.body.password, user.credential, (err,result) => {
+            bcrypt.compare(req.body.password, user.password, (err,result) => {
                 if(err){
                     return res.status(401).json({
                         message: 'Verificación fallida'
@@ -86,11 +86,9 @@ export const postSignup = async (req,res) => {
             }
             //Hash successful
             //Create and insert data received
-            User.create({        
+            User.create({   
                 user: req.body?.user,
-                credential: hash,
-                description: req.body?.description,
-                privileges: req.body?.privileges,  
+                password: hash,                                
             })
             .then( result => {
                 res.status(201).json({

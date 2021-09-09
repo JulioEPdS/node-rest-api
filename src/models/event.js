@@ -1,8 +1,12 @@
-import { DataTypes, Sequelize } from "sequelize";
+import { DataTypes, Sequelize } from "sequelize"
 import sequelize from '../database/connection'
 
-const eventos = sequelize.define('eventos', {
+const Eventos = sequelize.define('Eventos', {
   // Model attributes are defined here
+  id: {
+      type: DataTypes.UUID,
+      primaryKey: true
+  },
   type: {
     type: DataTypes.STRING,
     allowNull: false
@@ -48,7 +52,7 @@ const eventos = sequelize.define('eventos', {
   deleted:{
       type: DataTypes.BOOLEAN,      
   }
-} ,{timestamps: false} // Other model options go here inside ,{ }
-);
+}  // Other model options go here inside ,{ }
+)
 
-export default eventos
+export default Eventos

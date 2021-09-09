@@ -1,10 +1,10 @@
 import {Router} from 'express'
-import {deleteEvents, getDefinedEvent, getEvents, postEvents, putEvents} from '../controllers/events.controller'
+import {getEvents} from '../controllers/events.controller'
 import checkAuth from '../middleware/check-auth'
 
 const router = Router()
 
-router.get('/', checkAuth, getEvents)
+router.get('/', getEvents)
 
 //router.post('/', checkAuth , postEvents)
 

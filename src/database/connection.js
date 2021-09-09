@@ -5,7 +5,17 @@ import Sequelize from 'sequelize' //Importing the connection
 const sequelize = new Sequelize(config.dbDatabase, config.dbUser, config.dbPassword, {
     host: 'localhost',
     dialect: 'mssql',
-    timezone: '-05:00' //ADJUSTED FOR TIME OFFSET OF THE SERVER, remove if server has correct stamptime 
+    define:{        
+        timezone: '-05:00', //ADJUSTED FOR TIME OFFSET OF THE SERVER, remove if server has correct stamptime RUN QUERY to verify
+        freezeTableName: true,
+        timestamps: false,
+        pool: {
+            max: 5,
+            min: 0,
+            acquire: 30000,
+            idle: 10000
+        }
+    }
     /* run SELECT SYSDATETIME()  
     ,SYSDATETIMEOFFSET()  
     ,SYSUTCDATETIME()  

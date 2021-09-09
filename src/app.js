@@ -6,12 +6,17 @@ import config from './config'
 import eventsRoutes from './routes/events.routes'
 import usersRoutes from './routes/users.routes'
 
-/*const whitelist = ['http://localhost:3000','http://192.168.2.32:3000']
+/*PORCIÓN DE CÓDIGO QUE BLOQUEA TODO ACCESO A LA API
+******NO recomendada porque también exluye conexiones desde endpoints que no sean un navegador****
+const whitelist = ['http://localhost:3000','http://192.168.2.32:3000']
 const corsOptions = {
     origin: function (origin, callback) {
         if(whitelist.indexOf(origin) !== -1){
             callback(null, true)
         }else{
+            res.status(404).json({
+                message: 'Not Allowed connection'
+            })
         }
     },
     optionsSuccessStatus: 200
@@ -32,8 +37,8 @@ app.use(express.json())
 app.use(express.urlencoded({extended: false}))
 
 // routes
-app.use('/eventos', eventsRoutes)
 app.use('/usuarios', usersRoutes)
+app.use('/eventos', eventsRoutes)
 /*app.use('/certificados',certRoutes)
 app.use('/categorias',categoRoutes)
 app.use('/ponentes',speakRoutes)
