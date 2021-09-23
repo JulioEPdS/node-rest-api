@@ -1,12 +1,14 @@
 import {Router} from 'express'
-import {postLogin, postSignup} from '../controllers/users.controller'
+import {userLogin, userCreate} from '../controllers/users.controller'
 
 const router = Router()
 
 
-router.post('/login', postLogin)
+router.post('/login', userLogin)
 
-router.post('/signup', postSignup)
+router.post('/create', userCreate)
+
+//router.post('/testjson', testJson)
 
 
 export default router

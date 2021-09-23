@@ -1,112 +1,101 @@
-import User from '../models/user'
 import config from '../config'
-import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
+import { getConnection, sql } from '../database/connection'
 
+import bcrypt from 'bcrypt' //FOR HASHING
+import { MAX } from 'mssql'
 
 //CODE FOR HANDLING THE LOGIN REQUESTS ############################################################
-export const postLogin = async (req,res) => {
-    //Validating the req returned values for user and credential
-    if(req?.user !== null && req?.password !== null){
-        User.findOne({where:{
-            user: req.body?.user
-        }})
-        .then(user => {
-            if(user === null){
-                //USER DOESN'T EXIST 
-                //cancel the operation
-                return res.status(401).json({
-                    message: 'Verificación fallida'
-                })               
-            } 
+export const userLogin = async ( req, res ) => {
+    const { user, password } = req.body
+    if( user && password ){
+        const pool = await getConnection()
+        await pool
+        .request()
+        .input( 'user', sql.VarChar(50), user )
+        .input( 'password', sql.VarChar(50), password )
+        .output( 'role', sql.VarChar(20) )
+        .execute( 'userLogin' )
+        .then( result => {
+            if( result.returnValue !== 200 ){
+                //When we get a negative response from SP
+                return res.status( result.returnValue ).json({                    
+                message: 'Validación fallida'})
+            }
             
-            //USER EXISTS 
-            //SO... VERIFY PASSWORD HASH COMPARE            
-            bcrypt.compare(req.body.password, user.password, (err,result) => {
-                if(err){
-                    return res.status(401).json({
-                        message: 'Verificación fallida'
-                    })
-                }
-                if(result){
-                    //mail and password matched
-                    //GENERATE TOKEN USING JWT
-                    const token = jwt.sign({
-                        email: user.user,
-                        userId: user.id
-                    }, 
-                    config.jwtKey,
-                    {
-                        expiresIn: "1h"
-                    })//JWT SIGN
-                    //If point reached, correct credentials
-                    return res.status(200).json({
-                        message: 'Credenciales verificadas',
-                        token: token
-                    })
-                }
-                res.status(401).json({
-                    message: 'Verificación fallida'
-                })
-            })//bcrypt
-        })
-        .catch(err => {
-            console.log(err)
-            res.status(500).json({
-                error: err
+            //GENERATE TOKEN USING JWT
+            const token = jwt.sign({
+                user: user,
+                role: result.output.role                    
+            },config.jwtKey,{
+                expiresIn: "1h"
+            })//JWT SIGN
+
+            //WE SEND TOKEN, DATABASE RESULT POSITIVE MATCH (user and password)
+            return res.status( result.returnValue ).json({
+                message: 'Credenciales verificadas',
+                token: token,                                      
             })
-        })
-                      
-    } else { //CAMPOS INCOMPLETOS
-        return res.status(400).json({
-            msg:"Bad request. Porfavor llene todos los campos"
+           
+        })    
+    } 
+    
+    else { //BAD REQUEST
+        return res.status( 400 ).json({
+            msg:"No se proporcionó información completa"
         })
     }
+
 }
 
+
 //CODE FOR HANDLING THE SIGNUP REQUESTS ############################################################
-export const postSignup = async (req,res) => {
-    User.findOne({where:{
-        user: req.body?.user
-    }})
-    .then(user => {
-        //Verify if mail is in use
-        if(user !== null){
-            return res.status(409).json({
-                message: 'El usuario no se encuentra disponible'
-            })
-        } 
-        //Inits hash proces to store the password securely
-        bcrypt.hash(req.body?.password, 10, (err, hash) => {
-            if(err) {
-                //Failed to hash, operation dropped
-                return res.status(500).json({
-                    error: err
-                })
+export const userCreate = async ( req, res ) => {
+    const { user, password, role} = req.body
+    if( user && password && role ){
+        const pool = await getConnection()
+        await pool 
+        .request()
+        .input( 'user', sql.VarChar(50), user )
+        .input( 'password', sql.VarChar(50), password )
+        .input( 'role', sql.VarChar(20), role )
+        .execute( 'userCreate' )
+        .then( result => {
+            if( result.returnValue == 201 ){
+                //DATABASE RESULT POSITIVE USER CREATED
+                return res.status( result.returnValue ).json({
+                message: 'Nuevo usuario creado'})
             }
-            //Hash successful
-            //Create and insert data received
-            User.create({   
-                user: req.body?.user,
-                password: hash,                                
+            //When we get a negative response from SP EITHER CONFLICT OR ERROR
+            return res.status( result.returnValue ).json({                    
+                message: 'Error al crear'
             })
-            .then( result => {
-                res.status(201).json({
-                message: 'Usuario registrado con éxito'
-                })
-            })
-            .catch(err => {
-                console.log(err)
-                res.status(500).json({
-                error: err
-                })
-            })
-        
-        })            
-    })
-    .catch(err => {
-        console.log(err)
-        res.status(500).json({
-            error: err})
+                       
+        })        
     }
-)}
+    
+    else { //BAD REQUEST
+        return res.status( 400 ).json({
+            msg:"No se proporcionó información completa"
+        })
+    }
+    
+}
+
+
+/*
+export const testJson = async(req, res) =>{
+    const json = JSON.stringify(req.body.datos)
+    const pool = await getConnection()
+    await pool 
+    .request()        
+    .input( 'JSON', sql.NVarChar(MAX), json)
+    .execute( 'testJson' )
+    .then( result => {
+        return res.status(200).json({
+            rsultado: result
+            
+      })
+      
+    })
+}*/

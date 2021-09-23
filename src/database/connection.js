@@ -1,6 +1,35 @@
+import sql from 'mssql'
 import config from '../config'
-import Sequelize from 'sequelize' //Importing the connection
 
+//TO USE MSSQL LIBRARY AND COMMUNICATE DIRECTLY
+const dbSettings ={
+    user: config.dbUser,
+    password: config.dbPassword,
+    server: config.dbServer,
+    database: config.dbDatabase,
+    options: {
+        encrypt: true, // for azure
+        trustServerCertificate: true // change to true for local dev / self-signed certs
+    }
+}
+
+export async function getConnection(){
+    try{
+        const pool = await sql.connect(dbSettings)
+        return pool
+    }catch(error){
+        console.log(error)
+    }
+}
+
+export {sql}
+
+
+
+
+//import Sequelize from 'sequelize'
+//Importing the connection
+/*
 //Conection using ORM sequelize
 const sequelize = new Sequelize(config.dbDatabase, config.dbUser, config.dbPassword, {
     host: 'localhost',
@@ -21,32 +50,8 @@ const sequelize = new Sequelize(config.dbDatabase, config.dbUser, config.dbPassw
     ,SYSUTCDATETIME()  
     ,CURRENT_TIMESTAMP  
     ,GETDATE()  
-    ,GETUTCDATE(); to verify */
+    ,GETUTCDATE(); to verify 
 })
-
 export default sequelize
+*/
 
-
-
-//TO USE MSSQL LIBRARY AND COMMUNICATE DIRECTLY
-/*const dbSettings ={
-    user: config.dbUser,
-    password: config.dbPassword,
-    server: config.dbServer,
-    database: config.dbDatabase,
-    //options: {
-      //  encrypt: true, // for azure
-      //  trustServerCertificate: true // change to true for local dev / self-signed certs
-    //}
-}
-
-export async function getConnection(){
-    try{
-        const pool = await sql.connect(dbSettings)
-        return pool
-    }catch(error){
-        console.log(error)
-    }
-}
-
-export {sql} */

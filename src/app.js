@@ -5,8 +5,9 @@ import helmet from 'helmet'
 import config from './config'
 import eventsRoutes from './routes/events.routes'
 import usersRoutes from './routes/users.routes'
+import publicRoutes from './routes/openapi.routes'
 
-/*PORCIÓN DE CÓDIGO QUE BLOQUEA TODO ACCESO A LA API
+/*PORCIÓN DE CÓDIGO QUE BLOQUEA TODO ACCESO A LA API QUE NO PROVENGA DE LA PÁGINA OFICIAL
 ******NO recomendada porque también exluye conexiones desde endpoints que no sean un navegador****
 const whitelist = ['http://localhost:3000','http://192.168.2.32:3000']
 const corsOptions = {
@@ -14,7 +15,7 @@ const corsOptions = {
         if(whitelist.indexOf(origin) !== -1){
             callback(null, true)
         }else{
-            res.status(404).json({
+            return res.status(404).json({
                 message: 'Not Allowed connection'
             })
         }
@@ -37,8 +38,10 @@ app.use(express.json())
 app.use(express.urlencoded({extended: false}))
 
 // routes
-app.use('/usuarios', usersRoutes)
-app.use('/eventos', eventsRoutes)
+//Todas deben cerrarse a la app web
+app.use('/usuarios', usersRoutes) 
+app.use('/eventos', eventsRoutes) 
+app.use('/api', publicRoutes) //unica ruta abierta al público **Inscripciones, registros, consulta global de eventos, sin modificaciones
 /*app.use('/certificados',certRoutes)
 app.use('/categorias',categoRoutes)
 app.use('/ponentes',speakRoutes)
