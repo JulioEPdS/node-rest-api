@@ -6,22 +6,11 @@ import config from './config'
 import eventsRoutes from './routes/events.routes'
 import usersRoutes from './routes/users.routes'
 import publicRoutes from './routes/openapi.routes'
+import objectsRoutes from './routes/objects.routes'
+import checkAuth from './middleware/check-auth'
 
-/*PORCIÓN DE CÓDIGO QUE BLOQUEA TODO ACCESO A LA API QUE NO PROVENGA DE LA PÁGINA OFICIAL
-******NO recomendada porque también exluye conexiones desde endpoints que no sean un navegador****
-const whitelist = ['http://localhost:3000','http://192.168.2.32:3000']
-const corsOptions = {
-    origin: function (origin, callback) {
-        if(whitelist.indexOf(origin) !== -1){
-            callback(null, true)
-        }else{
-            return res.status(404).json({
-                message: 'Not Allowed connection'
-            })
-        }
-    },
-    optionsSuccessStatus: 200
-}*/
+//PORCIÓN DE CÓDIGO QUE BLOQUEA TODO ACCESO A LA API QUE NO PROVENGA DE LA PÁGINA OFICIAL
+//******NO recomendada porque también exluye conexiones desde endpoints que no sean un navegador****
 
 const app = express()
 
@@ -30,7 +19,7 @@ app.set('port', config.port)
 
 app.use(cors())
 app.use(helmet())
-app.use(morgan('tiny'))
+app.use(morgan('short'))
 
 
 // middlewares
@@ -39,14 +28,11 @@ app.use(express.urlencoded({extended: false}))
 
 // routes
 //Todas deben cerrarse a la app web
-app.use('/usuarios', usersRoutes) 
-app.use('/eventos', eventsRoutes) 
-app.use('/api', publicRoutes) //unica ruta abierta al público **Inscripciones, registros, consulta global de eventos, sin modificaciones
-/*app.use('/certificados',certRoutes)
-app.use('/categorias',categoRoutes)
-app.use('/ponentes',speakRoutes)
-app.use('/empresas',companyRoutes)
-app.use('/informes',informRoutes)*/
+app.use('/usuarios', usersRoutes) //check auth dentro del router de usuarios
+app.use('/eventos', checkAuth, eventsRoutes)
+app.use('/client', publicRoutes) //unica ruta abierta al público **Inscripciones, registros, consulta global de eventos, sin modificaciones
+app.use('/objects', checkAuth, objectsRoutes)
+//app.use('/informes', checkAuth,informRoutes)
 
 //Handler for errors
 app.use((req, res, next)=>{

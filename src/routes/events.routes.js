@@ -8,10 +8,10 @@ router.get('/', getEvents)
 
 //router.post('/', checkAuth , postEvents)
 
-//router.get('/:eventId', cors(corsOptions), getDefinedEvent)
+//router.get('/:eventId',  getDefinedEvent)
 
-//router.delete('/:eventId', cors(corsOptions), deleteEvents)
+//router.delete('/:eventId', deleteEvents)
 
-//router.put('/', cors(corsOptions), putEvents)
+//router.put('/', putEvents)
 
 export default router

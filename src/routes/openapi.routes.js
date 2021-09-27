@@ -1,18 +1,22 @@
 import {Router} from 'express'
-import {participantInscript, participantLogin, participantSignup, participantValid, queryEventos} from '../controllers/openapi.controller'
+import {
+    editarDatosCorreo, queryInscript, 
+    queryLogin, querySignup, queryValid, 
+    queryEventos
+} from '../controllers/openapi.controller'
 
 const router = Router()
 
 router.get('/eventos', queryEventos)
 
-router.post('/login', participantLogin)
+router.post('/login', queryLogin)
 
-router.post('/registro', participantSignup)
+router.post('/registro', querySignup)
 
-router.post('/validacion',participantValid)
+router.post('/validacion',queryValid)
 
-router.post('/inscripcion', participantInscript)
+router.post('/inscripcion', queryInscript)
 
-
+router.post('/editardatos',editarDatosCorreo)
 
 export default router

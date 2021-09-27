@@ -1,43 +1,51 @@
 import config from '../config'
 import jwt from 'jsonwebtoken'
 import { getConnection, sql } from '../database/connection'
+import {v4 as uuidv4} from 'uuid'
 
-import bcrypt from 'bcrypt' //FOR HASHING
-import { MAX } from 'mssql'
 
 //CODE FOR HANDLING THE LOGIN REQUESTS ############################################################
 export const userLogin = async ( req, res ) => {
     const { user, password } = req.body
     if( user && password ){
-        const pool = await getConnection()
-        await pool
-        .request()
-        .input( 'user', sql.VarChar(50), user )
-        .input( 'password', sql.VarChar(50), password )
-        .output( 'role', sql.VarChar(20) )
-        .execute( 'userLogin' )
-        .then( result => {
-            if( result.returnValue !== 200 ){
-                //When we get a negative response from SP
-                return res.status( result.returnValue ).json({                    
-                message: 'Validación fallida'})
-            }
+        try{
+            const pool = await getConnection()
+            await pool
+            .request()
+            .input( 'user', sql.VarChar(50), user )
+            .input( 'password', sql.VarChar(50), password )
+            .output( 'role', sql.VarChar(20) )
+            .execute( 'userLogin' )
+            .then( result => {
+                if( result.returnValue !== 200 ){
+                    //When we get a negative response from SP
+                    return res.status( result.returnValue ).json({                    
+                    message: 'Validación fallida'})
+                }
             
-            //GENERATE TOKEN USING JWT
-            const token = jwt.sign({
-                user: user,
-                role: result.output.role                    
-            },config.jwtKey,{
+                //GENERATE TOKEN USING JWT
+                const token = jwt.sign({
+                    user: user,
+                    role: result.output.role                    
+                },config.jwtKey,{
                 expiresIn: "1h"
-            })//JWT SIGN
+                })//JWT SIGN
 
-            //WE SEND TOKEN, DATABASE RESULT POSITIVE MATCH (user and password)
-            return res.status( result.returnValue ).json({
-                message: 'Credenciales verificadas',
-                token: token,                                      
+                //WE SEND TOKEN, DATABASE RESULT POSITIVE MATCH (user and password)
+                return res.status( result.returnValue ).json({
+                    message: 'Credenciales verificadas',
+                    token: token,                                      
+                })
+           })  
+
+        } catch(err) {
+            console.log(err)
+            console.log('Continuando ...')
+            return res.status(500).json({
+                message: 'ha ocurrido un error al consultar'
             })
-           
-        })    
+    
+        }  
     } 
     
     else { //BAD REQUEST
@@ -52,10 +60,12 @@ export const userLogin = async ( req, res ) => {
 //CODE FOR HANDLING THE SIGNUP REQUESTS ############################################################
 export const userCreate = async ( req, res ) => {
     const { user, password, role} = req.body
+    const id = uuidv4()
     if( user && password && role ){
         const pool = await getConnection()
         await pool 
         .request()
+        .input( 'id', sql.VarChar(255), id )
         .input( 'user', sql.VarChar(50), user )
         .input( 'password', sql.VarChar(50), password )
         .input( 'role', sql.VarChar(20), role )
