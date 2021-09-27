@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon src/ovac.js --exec babel-node",
     "build": "babel src -d dist",
-    "start": "node dist"
+    "start": "node dist/ovac.js"
   },
   "keywords": [],
   "author": "TECNM-Tapachula",
