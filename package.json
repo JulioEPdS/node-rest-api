@@ -1,7 +1,7 @@
 {
   "name": "node-rest-api",
   "version": "1.0.0",
-  "description": "",
+  "description": "Node api para proyecto OVAC",
   "main": "index.js",
   "scripts": {
     "dev": "nodemon src/ovac.js --exec babel-node",
@@ -23,7 +23,6 @@
     "morgan": "^1.10.0",
     "mssql": "^7.2.1",
     "multer": "^1.4.3",
-    "slash": "^4.0.0",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
