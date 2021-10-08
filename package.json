@@ -21,6 +21,8 @@
     "jsonwebtoken": "^8.5.1",
     "morgan": "^1.10.0",
     "mssql": "^7.2.1",
+    "multer": "^1.4.3",
+    "slash": "^4.0.0",
     "uuid": "^8.3.2"
   },
   "devDependencies": {

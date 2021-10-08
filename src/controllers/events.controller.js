@@ -1,15 +1,7 @@
 import {getConnection, sql} from '../database/connection'
 
 //Handles get method for all events ordered by ###############################################################
-export const getEvents = async (req,res) => {
-    /*const result = await Event.findAll({
-        where: { status: 1 },
-        order: [
-            ['start_date', 'ASC'] //Defines order to get earlier events
-        ]
-    })*/
-    //res.json(result)
-    //console.log(result)
+export const getEvents = async (req,res) => {    
 
     const pool = await getConnection()
         await pool 
@@ -20,9 +12,7 @@ export const getEvents = async (req,res) => {
                 //DATABASE RESULT POSITIVE USER CREATED
                 return res.status(200).json(result.recordset)
             }
-            //When we get a negative response from SP EITHER CONFLICT OR ERROR
-            
-                       
+            //When we get a negative response from SP EITHER CONFLICT OR ERROR                                  
         }) 
 }
 

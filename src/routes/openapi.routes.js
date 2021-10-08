@@ -18,5 +18,7 @@ router.post('/validacion',queryValid)
 router.post('/inscripcion', queryInscript)
 
 router.post('/editardatos',editarDatosCorreo)
+//Route to create a JWT, parse a link access to OVAC webapp to edit data
+//Use checkAuth and set cors to only allow access through OVAC webapp
 
 export default router

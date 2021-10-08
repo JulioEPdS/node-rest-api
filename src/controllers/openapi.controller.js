@@ -134,7 +134,6 @@ export const queryInscript = async(req,res) =>{
     }
 }
 
-
 export const editarDatosCorreo = async(req,res)=>{
     res.json({
         msg:'Desde aquí enviamos un correo con una liga para editar los datos de alguien sin una cuenta'

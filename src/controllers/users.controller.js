@@ -6,15 +6,14 @@ import {v4 as uuidv4} from 'uuid'
 
 //CODE FOR HANDLING THE LOGIN REQUESTS ############################################################
 export const userLogin = async ( req, res ) => {
-    const { user, password } = req.body
-    if( user && password ){
+    const { usuario, contraseña } = req.body
+    if( usuario && contraseña ){
         try{
             const pool = await getConnection()
             await pool
             .request()
-            .input( 'user', sql.VarChar(50), user )
-            .input( 'password', sql.VarChar(50), password )
-            .output( 'role', sql.VarChar(20) )
+            .input( 'usuario', sql.VarChar(50), usuario )
+            .input( 'contraseña', sql.VarChar(50), contraseña )
             .execute( 'userLogin' )
             .then( result => {
                 if( result.returnValue !== 200 ){
@@ -25,16 +24,17 @@ export const userLogin = async ( req, res ) => {
             
                 //GENERATE TOKEN USING JWT
                 const token = jwt.sign({
-                    user: user,
-                    role: result.output.role                    
+                    user: usuario,                    
                 },config.jwtKey,{
                 expiresIn: "1h"
                 })//JWT SIGN
 
-                //WE SEND TOKEN, DATABASE RESULT POSITIVE MATCH (user and password)
+                //WE SEND TOKEN, DATABASE RESULT POSITIVE MATCH (usuario and password)
                 return res.status( result.returnValue ).json({
                     message: 'Credenciales verificadas',
                     token: token,                                      
+                    info: result.recordset
+                    
                 })
            })  
 
@@ -59,16 +59,19 @@ export const userLogin = async ( req, res ) => {
 
 //CODE FOR HANDLING THE SIGNUP REQUESTS ############################################################
 export const userCreate = async ( req, res ) => {
-    const { user, password, role} = req.body
+    const { usuario, contraseña, rol, nombre, apellido_p, apellido_m} = req.body
     const id = uuidv4()
-    if( user && password && role ){
+    if( usuario && contraseña && rol && nombre && apellido_p && apellido_m){
         const pool = await getConnection()
         await pool 
         .request()
         .input( 'id', sql.VarChar(255), id )
-        .input( 'user', sql.VarChar(50), user )
-        .input( 'password', sql.VarChar(50), password )
-        .input( 'role', sql.VarChar(20), role )
+        .input( 'usuario', sql.VarChar(50), usuario )
+        .input( 'contraseña', sql.VarChar(50), contraseña )
+        .input( 'nombre', sql.VarChar(50), nombre)
+        .input( 'apep', sql.VarChar(50), apellido_p)
+        .input( 'apem', sql.VarChar(50), apellido_m)
+        .input( 'rol', sql.VarChar(20), rol )
         .execute( 'userCreate' )
         .then( result => {
             if( result.returnValue == 201 ){

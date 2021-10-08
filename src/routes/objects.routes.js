@@ -1,11 +1,25 @@
-import {Router} from 'express'
-import {    
-    getallCat,getallCert,getallEmp,getallForm,getallPon,
-    createCat,createCert,createEmp,createForm,createPon
-} from '../controllers/objects.controller'
+import { Router } from 'express'
+import { createCat, getallCat, getoneCat, updateCat, deleteCat } from '../controllers/categorias.controller'
+import { createCert, getallCert, getoneCert, updateCert, deleteCert} from '../controllers/certdocs.controller'
+import { createEmp, getallEmp, getoneEmp, updateEmp, deleteEmp } from '../controllers/empresas.controller'
+import { createForm, getallForm, getoneForm, updateForm, deleteForm } from '../controllers/formularios.controller'
+import { createPon, getallPon, getonePon, updatePon, deletePon } from '../controllers/pontentes.controller.js'
 
-import checkAuth from '../middleware/check-auth'
+import multer from 'multer'
 
+const constancias = multer.diskStorage({
+    destination: function(req, file, cb){
+        cb(null,'./uploads/constancias/')
+    },
+    filename: function(req, file, cb){        
+        cb(null, Date.now() + file.originalname)
+    }
+})
+/*fileFilter: .docx  PARA DELIMITAR EL TIPO DE ARCHIVO ACEPTADO*/
+/*limits:{fileSize: 1024 * 1024 * 5}  PARA DELIMITAR EL TAMAÑO DE ARCHIVO ACEPTADO*/
+
+
+const uploadC = multer({storage:constancias})
 
 const router = Router()
 
@@ -16,33 +30,32 @@ router.get('/empresas',getallEmp)
 router.get('/formularios',getallForm)
 router.get('/ponentes',getallPon)
 
-/*//GETS ESPECÍFICOS PARA OBJETOS GET ONE
-router.get('/categorias')
-router.get('/certdocs')
-router.get('/empresas')
-router.get('/formularios')
-router.get('/ponentes')*/
+//GETS ESPECÍFICOS PARA OBJETOS GET ONE
+router.get('/categoria/:id',getoneCat)
+router.get('/certdoc/:id',getoneCert)
+router.get('/empresa/:id',getoneEmp)
+router.get('/formulario/:id',getoneForm)
+router.get('/ponente/:id',getonePon)
 
 //POSTS PARA OBJETOS
-router.post('/categorias', createCat)
-router.post('/certdocs', createCert)
-router.post('/empresas', createEmp)
-router.post('/formularios', createForm)
-router.post('/ponentes',createPon)
+router.post('/categoria', createCat)
+router.post('/certdoc', uploadC.single('base'), createCert)
+router.post('/empresa', createEmp)
+router.post('/formulario', createForm)
+router.post('/ponente',createPon)
 
 ///PATCH PARA OBJETOS
-/*router.patch('/categorias')
-router.patch('/certdocs')
-router.patch('/empresas')
-router.patch('/formularios')
-router.patch('/ponentes')*/
+router.patch('/categorias/:id',updateCat)
+router.patch('/certdocs/:id',updateCert)
+router.patch('/empresas/:id',updateEmp)
+router.patch('/formularios/:id',updateForm)
+router.patch('/ponentes/:id',updatePon)
 
 ///DELETE PARA OBJETOS
-/*router.delete('/categorias')
-router.delete('/certdocs')
-router.delete('/empresas')
-router.delete('/formularios')
-router.delete('/ponentes')*/
-
+router.delete('/categorias/:id',deleteCat)
+router.delete('/certdocs/:id',deleteCert)
+router.delete('/empresas/:id',deleteEmp)
+router.delete('/formularios/:id',deleteForm)
+router.delete('/ponentes/:id',deletePon)
 
 export default router

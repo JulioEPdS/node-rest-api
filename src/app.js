@@ -10,7 +10,22 @@ import objectsRoutes from './routes/objects.routes'
 import checkAuth from './middleware/check-auth'
 
 //PORCIÓN DE CÓDIGO QUE BLOQUEA TODO ACCESO A LA API QUE NO PROVENGA DE LA PÁGINA OFICIAL
-//******NO recomendada porque también exluye conexiones desde endpoints que no sean un navegador****
+//Pero posible de evadir modificando el HEADER Origin en la request **VULNERABLE** pero 
+//mejor que tener la app sin el filtro de origen
+const whitelist = ['http://localhost:3000','http://192.168.50.32:3000']
+
+const corsOptions = {
+    origin: function (origin, callback) {
+        if(whitelist.indexOf(origin) !== -1){
+            callback(null, true)
+        }else{
+            console.log("Unauthorized atempt to use API routes")
+            throw Error("Not allowed to use");            
+        }
+    },
+    optionsSuccessStatus: 200
+}
+
 
 const app = express()
 
@@ -28,10 +43,10 @@ app.use(express.urlencoded({extended: false}))
 
 // routes
 //Todas deben cerrarse a la app web
-app.use('/usuarios', usersRoutes) //check auth dentro del router de usuarios
-app.use('/eventos', checkAuth, eventsRoutes)
+app.use('/usuarios',cors(corsOptions), usersRoutes) //check auth dentro del router de usuarios
+app.use('/eventos',cors(corsOptions), checkAuth, eventsRoutes)
 app.use('/client', publicRoutes) //unica ruta abierta al público **Inscripciones, registros, consulta global de eventos, sin modificaciones
-app.use('/objects', checkAuth, objectsRoutes)
+app.use('/objects',cors(corsOptions), checkAuth, objectsRoutes)
 //app.use('/informes', checkAuth,informRoutes)
 
 //Handler for errors
