@@ -1,6 +1,7 @@
 import {getConnection, sql} from '../database/connection'
 import {v4 as uuidv4} from 'uuid'
 import fs from 'fs'
+import path from 'path'
 //import slash from 'slash'
 
 
@@ -32,13 +33,34 @@ export const getallCert = async(req,res)=>{
 
 //QUERY ESPECÍFICOS PARA CONSTANCIAS GET ONE//////////////////////////////////////////////////////////////////////////////////////////////////////////
 export const getoneCert = async(req, res)=>{
+    try{
+        //Código incompleto
+        /*Código para enviar un archivo*/
+        const ruta = "uploads/constancias/"
+        var options={
+            root: path.join('./')
+        }
+        res.sendFile(ruta,options, function(err){
+            if(err){
+                console.log(err)
+                return
+            }
+            else{console.log("Enviado",ruta)}
+        })
+    }
+    catch(err){
+        console.log(err)
+        return res.status(500).json({
+            message: 'ha ocurrido un error al ejecutar la consulta de constancia'
+        })
+    }
 }
 
 //PROCESO INSERT PARA CONSTANCIAS//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 export const createCert = async(req,res) =>{
     try{
         const {tipo, nombre, descripcion, creador} = req.body
-        const ruta = req.file.path
+        const ruta = req.file.path        
         if(tipo && nombre && descripcion && ruta && creador){
             const id = uuidv4()
             const pool = await getConnection()
@@ -56,12 +78,7 @@ export const createCert = async(req,res) =>{
                     return res.status( result.returnValue ).json({
                         message: 'Nuevo certificado creado'})
                 }
-                
-                //try{fs.unlink("./"+ruta)}
-                //catch(err){console.log(err)}
-                //var path = slash(ruta)
-                //console.log(path)
-                
+                                                            
                 return res.status( result.returnValue ).json({                    
                     message: 'Creación de constancia fallida'})
 
@@ -70,7 +87,7 @@ export const createCert = async(req,res) =>{
             return res.status( 400 ).json({
                 msg:"No se proporcionó información completa"
             })
-        }        
+        }            
     }catch(err){
         console.log(err)
         console.log('Continuando ...')

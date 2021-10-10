@@ -9,7 +9,7 @@ import multer from 'multer'
 
 const constancias = multer.diskStorage({
     destination: function(req, file, cb){
-        cb(null,'./uploads/constancias/')
+        cb(null,'./uploads/constancias')
     },
     filename: function(req, file, cb){        
         cb(null, Date.now() + file.originalname)
