@@ -3,11 +3,16 @@ import morgan from 'morgan'
 import cors from 'cors'
 import helmet from 'helmet'
 import config from './config'
+
+import checkAuth from './middleware/check-auth'
+import checkPartAuth from './middleware/check-part-auth'
+
 import eventsRoutes from './routes/events.routes'
 import usersRoutes from './routes/users.routes'
 import publicRoutes from './routes/openapi.routes'
 import objectsRoutes from './routes/objects.routes'
-import checkAuth from './middleware/check-auth'
+import participantsRoutes from './routes/participants.routes'
+
 
 //PORCIÓN DE CÓDIGO QUE BLOQUEA TODO ACCESO A LA API QUE NO PROVENGA DE LA PÁGINA OFICIAL
 //Pero posible de evadir modificando el HEADER Origin en la request **VULNERABLE** pero 
@@ -43,10 +48,11 @@ app.use(express.urlencoded({extended: false}))
 
 // routes
 //Todas deben cerrarse a la app web
-app.use('/usuarios',cors(corsOptions), usersRoutes) //check auth dentro del router de usuarios
+app.use('/usuarios',cors(corsOptions), usersRoutes) //check auth dentro del router de registro/creación de usuarios
 app.use('/eventos',cors(corsOptions), checkAuth, eventsRoutes)
 app.use('/client', publicRoutes) //unica ruta abierta al público **Inscripciones, registros, consulta global de eventos, sin modificaciones
 app.use('/objects',cors(corsOptions), checkAuth, objectsRoutes)
+app.use('/participantes',checkPartAuth, participantsRoutes)//Ruta para los participantes registrados
 //app.use('/informes', checkAuth,informRoutes)
 
 //Handler for errors

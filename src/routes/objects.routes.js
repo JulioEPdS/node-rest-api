@@ -40,6 +40,7 @@ router.get('/ponente/:id',getonePon)
 //POSTS PARA OBJETOS
 router.post('/categoria', createCat)
 router.post('/certdoc', uploadC.single('base'), createCert)
+//+ uploadC para obtener archivo desde req y guardar en servidor
 router.post('/empresa', createEmp)
 router.post('/formulario', createForm)
 router.post('/ponente',createPon)

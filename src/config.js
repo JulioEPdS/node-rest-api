@@ -8,5 +8,6 @@ export default {
     dbPassword: process.env.DB_PASSWORD || '',
     dbServer: process.env.DB_SERVER || '',
     dbDatabase: process.env.DB_DATABASE || '',
-    jwtKey: process.env.JWT_KEY || ''  
+    jwtKey: process.env.JWT_KEY || ''  ,
+    jwt_APIKey: process.env.JWT_APIKEY || ''
 }

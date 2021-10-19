@@ -1,7 +1,7 @@
 import sql from 'mssql'
 import config from '../config'
 
-//TO USE MSSQL LIBRARY AND COMMUNICATE DIRECTLY
+//TO USE MSSQL LIBRARY AND COMMUNICATE
 const dbSettings ={
     user: config.dbUser,
     password: config.dbPassword,
@@ -23,35 +23,4 @@ export async function getConnection(){
 }
 
 export {sql}
-
-
-
-
-//import Sequelize from 'sequelize'
-//Importing the connection
-/*
-//Conection using ORM sequelize
-const sequelize = new Sequelize(config.dbDatabase, config.dbUser, config.dbPassword, {
-    host: 'localhost',
-    dialect: 'mssql',
-    define:{        
-        timezone: '-05:00', //ADJUSTED FOR TIME OFFSET OF THE SERVER, remove if server has correct stamptime RUN QUERY to verify
-        freezeTableName: true,
-        timestamps: false,
-        pool: {
-            max: 5,
-            min: 0,
-            acquire: 30000,
-            idle: 10000
-        }
-    }
-    /* run SELECT SYSDATETIME()  
-    ,SYSDATETIMEOFFSET()  
-    ,SYSUTCDATETIME()  
-    ,CURRENT_TIMESTAMP  
-    ,GETDATE()  
-    ,GETUTCDATE(); to verify 
-})
-export default sequelize
-*/
 

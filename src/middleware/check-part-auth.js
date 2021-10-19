@@ -1,11 +1,11 @@
 import jwt from 'jsonwebtoken'
 import config from '../config'
 
-//MÓDULO DE AUTENTICACIÓN DE TOKENS PARA PLATAFORMA
+//MÓDULO DE AUTENTICACIÓN DE TOKENS PARA PARTICIPANTES
 module.exports = (req, res, next) => {
     try {
         const token = req.headers.authorization.split(" ")[1]
-        const decoded = jwt.verify(token, config.jwtKey)
+        const decoded = jwt.verify(token, config.jwt_APIKey)
         req.userData = decoded
         next()
     } catch (error) {
