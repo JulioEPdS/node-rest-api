@@ -1,7 +1,7 @@
 import {Router} from 'express'
 import {
     editarDatosCorreo, queryInscript, 
-    queryLogin, querySignup, queryValid, 
+    queryLogin, querySignup, queryRegistro, queryValid, 
     queryEventos
 } from '../controllers/openapi.controller'
 
@@ -11,7 +11,9 @@ router.get('/eventos', queryEventos)
 
 router.post('/login', queryLogin)
 
-router.post('/registro', querySignup)
+router.post('/registro', queryRegistro)
+
+router.post('/signup', querySignup)
 
 router.post('/validacion',queryValid)
 
