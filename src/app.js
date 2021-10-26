@@ -39,7 +39,7 @@ app.set('port', config.port)
 
 app.use(cors())
 app.use(helmet())
-app.use(morgan('short'))
+app.use(morgan('common'))
 
 
 // middlewares

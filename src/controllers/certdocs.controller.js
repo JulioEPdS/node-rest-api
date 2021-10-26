@@ -1,6 +1,6 @@
 import {getConnection, sql} from '../database/connection'
 import {v4 as uuidv4} from 'uuid'
-import fs from 'fs'
+import {unlink} from 'fs'
 import path from 'path'
 //import slash from 'slash'
 
@@ -58,9 +58,9 @@ export const getoneCert = async(req, res)=>{
 
 //PROCESO INSERT PARA CONSTANCIAS//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 export const createCert = async(req,res) =>{
-    try{
-        const {tipo, nombre, descripcion, creador} = req.body
-        const ruta = req.file.path        
+    const {tipo, nombre, descripcion, creador} = req.body
+    const ruta = req.file.path
+    try{                
         if(tipo && nombre && descripcion && ruta && creador){
             const id = uuidv4()
             const pool = await getConnection()
@@ -78,19 +78,30 @@ export const createCert = async(req,res) =>{
                     return res.status( result.returnValue ).json({
                         message: 'Nuevo certificado creado'})
                 }
-                                                            
+                
+                unlink(ruta,(err)=>{
+                    if(err) throw err;
+                    console.log('se canceló guardado de archivo debido a un conflicto/error')
+                })
                 return res.status( result.returnValue ).json({                    
-                    message: 'Creación de constancia fallida'})
-
+                    message: 'Creación de constancia fallida'})                    
             })
         }else{
+            unlink(ruta,(err)=>{
+                if(err) throw err;
+                console.log('se canceló guardado de archivo debido a un conflicto/error')
+            })
             return res.status( 400 ).json({
                 msg:"No se proporcionó información completa"
-            })
+            })            
         }            
     }catch(err){
         console.log(err)
         console.log('Continuando ...')
+        unlink(ruta,(err)=>{
+            if(err) throw err;
+            console.log('se canceló guardado de archivo debido a un conflicto/error')
+        })
         return res.status(500).json({
             message: 'ha ocurrido un error al ejecutar la creación de constancia'
         })
