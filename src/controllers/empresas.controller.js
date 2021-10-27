@@ -4,14 +4,12 @@ import {v4 as uuidv4} from 'uuid'
 //QUERYS PARA OBJETOS GET ALL///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 export const getallEmp = async(req,res)=>{
     try
-    {
-        const input1 = 'NO'
-        const input2 = 'NO'
+    {                
         const pool = await getConnection()
         await pool
         .request()
-        .input('specific', sql.VarChar(6),input1)
-        .input('id',sql.VarChar(255),input2)
+        .input('specific', sql.VarChar(6),'NO')
+        .input('id',sql.VarChar(255),'noid')
         .execute('getEmpresas')
         .then(result => {
                 return res.status(200).json(

@@ -7,7 +7,9 @@ export const getEvents = async (req,res) => {
     const pool = await getConnection()
         await pool 
         .request()
-        .execute( 'getEventos' )
+        .input('specific',sql.VarChar(6),'NO')
+        .input('id',sql.VarChar(255),'NO')
+        .execute( 'getEventos' )        
         .then( result => {
             if( result ){
                 //DATABASE RESULT POSITIVE USER CREATED
