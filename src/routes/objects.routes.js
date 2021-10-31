@@ -6,6 +6,7 @@ import { createForm, getallForm, getoneForm, updateForm, deleteForm } from '../c
 import { createPon, getallPon, getonePon, updatePon, deletePon } from '../controllers/pontentes.controller.js'
 
 import multer from 'multer'
+import { getAllObjects } from '../controllers/objects.controller'
 
 const constancias = multer.diskStorage({
     destination: function(req, file, cb){
@@ -22,6 +23,10 @@ const constancias = multer.diskStorage({
 const uploadC = multer({storage:constancias})
 
 const router = Router()
+
+
+//GET GENERAL, obtiene todos los registros de objetos
+router.get('/allobjects',getAllObjects)
 
 //GETS PARA OBJETOS GET ALL
 router.get('/categorias',getallCat)
