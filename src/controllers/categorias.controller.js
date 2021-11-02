@@ -34,7 +34,7 @@ export const getoneCat = async(req, res)=>{}
 //QUERYS INSERT PARA OBJETOS//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 export const createCat = async(req,res) =>{
     try{
-        const {nombre, descripcion,color, icon, creador} = req.body
+        const {nombre, descripcion, color, icon, creador} = req.body
         if(nombre && descripcion && color && icon && creador){
             const id = uuidv4()
             const pool = await getConnection()

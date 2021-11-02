@@ -12,6 +12,7 @@ import usersRoutes from './routes/users.routes'
 import publicRoutes from './routes/openapi.routes'
 import objectsRoutes from './routes/objects.routes'
 import participantsRoutes from './routes/participants.routes'
+import { imprimirdoc } from './controllers/impresordocumentos'
 
 
 //PORCIÓN DE CÓDIGO QUE BLOQUEA TODO ACCESO A LA API QUE NO PROVENGA DE LA PÁGINA OFICIAL
@@ -54,6 +55,12 @@ app.use('/client', publicRoutes) //unica ruta abierta al público **Inscripcione
 app.use('/objects',cors(corsOptions), checkAuth, objectsRoutes)
 app.use('/participantes',checkPartAuth, participantsRoutes)//Ruta para los participantes registrados
 //app.use('/informes', checkAuth,informRoutes)
+
+
+/*#############################SEGMENTO DE PRUEBAS######################################################*/
+app.use('/imprime',imprimirdoc)
+
+/*#############################SEGMENTO DE PRUEBAS######################################################*/
 
 //Handler for errors
 app.use((req, res, next)=>{

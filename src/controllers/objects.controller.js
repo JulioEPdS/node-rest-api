@@ -8,7 +8,7 @@ export const getAllObjects = async (req, res) => {
             .execute('getObjects')
             .then(
                 (result) => {                    
-                    return res.status(304).json({
+                    return res.status(200).json({
                         categorias: result.recordsets[0],
                         constancias: result.recordsets[1],
                         empresas: result.recordsets[2],
