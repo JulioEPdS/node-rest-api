@@ -12,7 +12,7 @@ import usersRoutes from './routes/users.routes'
 import publicRoutes from './routes/openapi.routes'
 import objectsRoutes from './routes/objects.routes'
 import participantsRoutes from './routes/participants.routes'
-import { imprimirdoc } from './controllers/impresordocumentos'
+import { crearDesdeBD, enviarDoc, imprimirdoc } from './controllers/impresordocumentos'
 
 
 //PORCIÓN DE CÓDIGO QUE BLOQUEA TODO ACCESO A LA API QUE NO PROVENGA DE LA PÁGINA OFICIAL
@@ -48,7 +48,8 @@ app.use(express.json())
 app.use(express.urlencoded({extended: false}))
 
 // routes
-//Todas deben cerrarse a la app web
+//cors(corsOptions) se asegura de que exista un header de origen con la dirección del front-end !!NO ES UNA IMPLEMENTACIÓN ROBUSTA DE SEGURIDAD!!
+//checkAuth se asegura de que la solicitud contenga un JWT válido y que pertenezca a este servidor !!IMPLEMENTACIÓN DE SEGURIDAD!!
 app.use('/usuarios',cors(corsOptions), usersRoutes) //check auth dentro del router de registro/creación de usuarios
 app.use('/eventos',cors(corsOptions), checkAuth, eventsRoutes)
 app.use('/client', publicRoutes) //unica ruta abierta al público **Inscripciones, registros, consulta global de eventos, sin modificaciones
@@ -57,10 +58,11 @@ app.use('/participantes',checkPartAuth, participantsRoutes)//Ruta para los parti
 //app.use('/informes', checkAuth,informRoutes)
 
 
-/*#############################SEGMENTO DE PRUEBAS######################################################*/
-app.use('/imprime',imprimirdoc)
+/*#############################SEGMENTO DE PRUEBAS###############################################################*/
+app.use('/imprime',enviarDoc) //IMPRIME TEXTO SOBRE IMÁGEN, IDEAL PARA GENERAR RECONOCIMIENTOS
+app.use('/creadesdebd',crearDesdeBD)
 
-/*#############################SEGMENTO DE PRUEBAS######################################################*/
+/*#############################SEGMENTO DE PRUEBAS###############################################################*/
 
 //Handler for errors
 app.use((req, res, next)=>{

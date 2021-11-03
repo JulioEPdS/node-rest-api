@@ -4,6 +4,8 @@ import {unlink} from 'fs'
 import path from 'path'
 //import slash from 'slash'
 
+//import multer from 'multer'
+
 
 //SELECT * CONSTANCIAS GET ALL///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 export const getallCert = async(req,res)=>{
