@@ -1,9 +1,9 @@
 import { Router } from 'express'
-import { createCat, getallCat, getoneCat, updateCat, deleteCat } from '../controllers/categorias.controller'
-import { createCert, getallCert, getoneCert, updateCert, deleteCert } from '../controllers/certdocs.controller'
-import { createEmp, getallEmp, getoneEmp, updateEmp, deleteEmp } from '../controllers/empresas.controller'
-import { createForm, getallForm, getoneForm, updateForm, deleteForm } from '../controllers/formularios.controller'
-import { createPon, getallPon, getonePon, updatePon, deletePon } from '../controllers/pontentes.controller.js'
+import { createCat, getCat, updateCat, deleteCat } from '../controllers/categorias.controller'
+import { createCert, getCert, updateCert, deleteCert } from '../controllers/certdocs.controller'
+import { createEmp, getEmp, updateEmp, deleteEmp } from '../controllers/empresas.controller'
+import { createForm, getForm, updateForm, deleteForm } from '../controllers/formularios.controller'
+import { createPon, getPon, updatePon, deletePon } from '../controllers/pontentes.controller.js'
 
 //import multer from 'multer'
 
@@ -18,19 +18,13 @@ const router = Router()
 //GET GENERAL, obtiene todos los registros de objetos
 router.get('/allobjects', getAllObjects)
 
-//GETS PARA OBJETOS GET ALL
-router.get('/categorias', getallCat)
-router.get('/certdocs', getallCert)
-router.get('/empresas', getallEmp)
-router.get('/formularios', getallForm)
-router.get('/ponentes', getallPon)
+//GETS PARA OBJETOS FUNCIONAN TANTO PARA ESPECÍFICOS COMO PARA INDIVIDUALES
+router.get('/categorias', getCat)
+router.get('/certdocs', getCert)
+router.get('/empresas', getEmp)
+router.get('/formularios', getForm)
+router.get('/ponentes', getPon)
 
-//GETS ESPECÍFICOS PARA OBJETOS GET ONE
-router.get('/categoria/:id', getoneCat)
-router.get('/certdoc/:id', getoneCert)
-router.get('/empresa/:id', getoneEmp)
-router.get('/formulario/:id', getoneForm)
-router.get('/ponente/:id', getonePon)
 
 //POSTS PARA OBJETOS
 router.post('/categoria', createCat)

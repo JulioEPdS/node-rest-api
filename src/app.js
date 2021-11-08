@@ -9,12 +9,15 @@ import checkPartAuth from './middleware/check-part-auth'
 
 import eventsRoutes from './routes/events.routes'
 import usersRoutes from './routes/users.routes'
-import publicRoutes from './routes/openapi.routes'
 import objectsRoutes from './routes/objects.routes'
+
 import participantsRoutes from './routes/participants.routes'
+
+import publicRoutes from './routes/openapi.routes'
+
 import { crearDesdeBD, enviarDoc, imprimirdoc } from './controllers/impresordocumentos'
 
-
+//export let mailSending = {e1:0, e2:0}
 //PORCIÓN DE CÓDIGO QUE BLOQUEA TODO ACCESO A LA API QUE NO PROVENGA DE LA PÁGINA OFICIAL
 //Pero posible de evadir modificando el HEADER Origin en la request **VULNERABLE** pero 
 //mejor que tener la app sin el filtro de origen
@@ -51,15 +54,18 @@ app.use(express.urlencoded({extended: false}))
 //cors(corsOptions) se asegura de que exista un header de origen con la dirección del front-end !!NO ES UNA IMPLEMENTACIÓN ROBUSTA DE SEGURIDAD!!
 //checkAuth se asegura de que la solicitud contenga un JWT válido y que pertenezca a este servidor !!IMPLEMENTACIÓN DE SEGURIDAD!!
 app.use('/usuarios',cors(corsOptions), usersRoutes) //check auth dentro del router de registro/creación de usuarios
+
 app.use('/eventos',cors(corsOptions), checkAuth, eventsRoutes)
-app.use('/client', publicRoutes) //unica ruta abierta al público **Inscripciones, registros, consulta global de eventos, sin modificaciones
 app.use('/objects',cors(corsOptions), checkAuth, objectsRoutes)
+
 app.use('/participantes',checkPartAuth, participantsRoutes)//Ruta para los participantes registrados
+
+app.use('/client', publicRoutes) //unica ruta abierta al público **Inscripciones, registros, consulta global de eventos, sin modificaciones
 //app.use('/informes', checkAuth,informRoutes)
 
 
 /*#############################SEGMENTO DE PRUEBAS###############################################################*/
-app.use('/imprime',enviarDoc) //IMPRIME TEXTO SOBRE IMÁGEN, IDEAL PARA GENERAR RECONOCIMIENTOS
+//app.use('/imprime',enviarDoc) //IMPRIME TEXTO SOBRE IMÁGEN, IDEAL PARA GENERAR RECONOCIMIENTOS
 app.use('/creadesdebd',crearDesdeBD)
 
 /*#############################SEGMENTO DE PRUEBAS###############################################################*/
@@ -79,5 +85,10 @@ app.use((error, req, res, next)=>{
         }
     })
 })
+
+
+/*setInterval(function(){
+    console.log('Han pasado 30 segundos...')
+},30*1000)*/
 
 export default app

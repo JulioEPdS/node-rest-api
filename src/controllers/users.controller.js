@@ -6,14 +6,14 @@ import {v4 as uuidv4} from 'uuid'
 
 //CODE FOR HANDLING THE LOGIN REQUESTS ############################################################
 export const userLogin = async ( req, res ) => {
-    const { usuario, contraseña } = req.body
-    if( usuario && contraseña ){
+    const { user, password } = req.body
+    if( user && password ){
         try{
             const pool = await getConnection()
             await pool
             .request()
-            .input( 'usuario', sql.VarChar(50), usuario )
-            .input( 'contraseña', sql.VarChar(50), contraseña )
+            .input( 'user', sql.VarChar(50), user )
+            .input( 'password', sql.VarChar(50), password )
             .execute( 'userLogin' )
             .then( result => {
                 if( result.returnValue !== 200 ){
@@ -24,7 +24,7 @@ export const userLogin = async ( req, res ) => {
             
                 //GENERATE TOKEN USING JWT
                 const token = jwt.sign({
-                    user: usuario,                    
+                    user: user,                    
                 },config.jwtKey,{
                 expiresIn: "1h"
                 })//JWT SIGN
@@ -59,18 +59,18 @@ export const userLogin = async ( req, res ) => {
 
 //CODE FOR HANDLING THE SIGNUP REQUESTS ############################################################
 export const userCreate = async ( req, res ) => {
-    const { usuario, contraseña, rol, nombre, apellido_p, apellido_m} = req.body
+    const { user, password, rol, nombre, apellido_p, apellido_m} = req.body
     const id = uuidv4()
-    if( usuario && contraseña && rol && nombre && apellido_p && apellido_m){
+    if( user && password && rol && nombre && apellido_p && apellido_m){
         const pool = await getConnection()
-        await pool 
+        await pool
         .request()
         .input( 'id', sql.VarChar(255), id )
-        .input( 'usuario', sql.VarChar(50), usuario )
-        .input( 'contraseña', sql.VarChar(50), contraseña )
+        .input( 'user', sql.VarChar(50), user )
+        .input( 'password', sql.VarChar(50), password )
         .input( 'nombre', sql.VarChar(50), nombre)
-        .input( 'apep', sql.VarChar(50), apellido_p)
-        .input( 'apem', sql.VarChar(50), apellido_m)
+        .input( 'apellido_p', sql.VarChar(50), apellido_p)
+        .input( 'apellido_m', sql.VarChar(50), apellido_m)
         .input( 'rol', sql.VarChar(20), rol )
         .execute( 'userCreate' )
         .then( result => {
