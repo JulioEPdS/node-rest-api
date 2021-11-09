@@ -7,10 +7,18 @@ import { v4 as uuidv4 } from 'uuid' //Ayuda a generar UUIDs
 
 import jwt from 'jsonwebtoken' //Ayuda a generar nuestros tokens
 import nodemailer from 'nodemailer' //MAILER
-import generator from 'generate-password'
-import { mailSending } from '../app'
+import generator from 'generate-password' //Ayuda a generar passwords para el temporal access
+import Jimp from 'jimp'
+
 
 import fs from 'fs'
+
+
+function sleep(ms) {
+    return new Promise((resolve) => {
+        setTimeout(resolve, ms);
+    });
+}
 
 
 
@@ -436,81 +444,160 @@ export const editarDatosControlled = async (req, res) => {
 
 
 export const reqUpgrade = async (req, res) => {
-    //RECIBIR EMAIL req.body
 
-    //CONSULTAR CORREO EN BD, 
-    //ELIMINAR ACCESO TEMPORAL SI EXISTE--CREAR ACCESO TEMPORAL GUARDAR EN BD
-    //ENVIAR DATOS DE ACCESO TEMPORAL POR CORREO
-
-    const str = config.mails
-    const correos = JSON.parse(str)
-    let state = []
-
+    const str = config.mails //WE EXTRACT THE CREDENTIALS 
+    const correos = JSON.parse(str) //NEEDED TO READ DATA FROM STR
+    let state = [] //CONTAINS THE ACTUAL STATE CONFIG DATA
+    let selectedM = null
+    let rutasalida = ''
 
     const pass = generator.generate({
         length: 10,
         numbers: true,
-        symbols: true,
         excludeSimilarCharacters: true
     })//GENERATES A NEW PASSWORD
 
+
+    //READ DATA FOR IMAGE
+    const ruta = config.baseimage
+    const fuente = await Jimp.loadFont(Jimp.FONT_SANS_64_BLACK)
+    const image = await Jimp.read(ruta)
+
+    //IN ORDER TO KNOW WHICH MAIL IS AVAILABLE TO USE
     fs.readFile('./state.txt', 'utf8', (err, data) => {
-        if(err){
+        if (err) {
             console.log(err)
             return
         }
         state = JSON.parse(data)
 
+        for (var i = 0; i <= 5; i++) {
+            if (state[i] < 300) {
+                selectedM = i //SAVES INDEX OF THE MAIL TO USE
+                break
+            }
+        }
     })
-    console.log(state)
 
-    return res.status(200).json({message:'check'})
+    //RECIBIR EMAIL req.body
+    const { email } = req.body
+    if (email && pass) {
+        //SAVE PASS TO DATABASE
+        //CONSULTAR CORREO EN BD, 
+        //ELIMINAR ACCESO TEMPORAL SI EXISTE--CREAR ACCESO TEMPORAL GUARDAR EN BD
+        try {
+            const pool = await getConnection()
+            await pool
+                .request()
+                .input('email', sql.VarChar(100), email)
+                .input('password', sql.VarChar(10), pass)
+                .execute('createTemporalAcc')
+                .then(result => {
+                    if (result.returnValue != 200) {
+                        return res.status(result.returnValue).json({
+                            message: 'No se pudo continuar, verifique su correo'
+                        })
+                    }
+                    print()
+                })
+        }
+        catch {
+            return res.status(500).json({
+                message: 'Error del sistema'
+            })
+        }
 
-    /*const { email } = req.body
-    if(email && pass){
-        let transporter = nodemailer.createTransport({
-            service: "hotmail",
-            auth: {
-                user: correos[2].email,
-                pass: correos[2].pass
-            }
-        })
-    
-        var options = {
-            from: correos[i].email,
-            to: email,
-            subject: "Solicitud de Upgrade Capacitaciones SEyT",
-            text: "Por favor espera que el correo cargue...",
-            html: "<p>Utiliza esta clave secreta para acceder: "+pass+" </p>"
-        };
-    
-        //console.log(transportesList[i].t)
-    
-        transporter.sendMail(options, function (err, info) {
-            if (err) {
-                console.log(err)
-                return
-            }
-    
-            console.log('Sent: ', info.response)
-        })
-    
-        return res.status(200).json({
-            message: 'El proceso de invitación se está ejecutando en segundo plano'
+        async function print() {
+            image.print(
+                fuente,
+                0,
+                157,
+                {
+                    text: pass,
+                    alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER,
+                    alignmentY: Jimp.VERTICAL_ALIGN_MIDDLE
+                },
+                496
+            )
+            rutasalida = './uploads/temporal/' + pass + '.jpg'
+            await image.writeAsync(rutasalida)
+            
+            enviaremail()
+        }
+        //PRINT THE IMAGE TO SEND WITH THE PASSWORD EMBEBED 
+
+
+        //timeout FOR SYNC        
+        //ENVIAR DATOS DE ACCESO TEMPORAL POR CORREO  
+        async function enviaremail() {
+            //SEND PASS TO USER VIA EMAIL
+            //TRANSPORTER, NEEDED TO PERFORM SEND
+            let transporter = nodemailer.createTransport({
+                service: "hotmail",
+                auth: {
+                    user: correos[selectedM].email,
+                    pass: correos[selectedM].pass
+                }
+            })
+
+            //DEFINE THE DATA TO SEND IN MAIL AND DESTINATARY
+            var options = {
+                from: correos[selectedM].email,
+                to: email,
+                subject: "Solicitud de Upgrade Capacitaciones SEyT",
+                text: "Por favor espera que el correo cargue...",
+                html: 'Este es tu acceso: <img src="cid:imagecid"/>',
+                attachments: [{
+                    filename: '' + pass + '.jpg',
+                    path: rutasalida,
+                    cid: 'imagecid'
+                }]
+            };
+
+            //SEND MAIL WITH PASSWORD
+            transporter.sendMail(options, function (err, info) {
+                if (err) {
+                    console.log(err)
+                    return res.status(500).json({ message: 'No se pudo enviar el correo' })
+                }
+
+                console.log('Sent: ', info.response)
+
+                return res.status(200).json({
+                    message: 'Se envió el correo con la password temporal'
+                })
+
+                //ADD +1 TO COUNTER TO RESPECTIVE selectedMail
+                //consolole.log(state[selectedM])
+                //WRITE +1
+                /*fs.writeFile('./state.txt', newData, function (err) {
+                    if (err) console.log(err)
+     
+                    console.log('Imprimi en archivo')
+                    return
+                })*/
+
+                
+            })
+
+        }
+
+
+
+    }
+    else {
+        return res.status(400).json({
+            message: 'No se obtuvo respuesta positiva'
         })
 
-    }*/
+    }
+
 
     //const str = '[{"t":"transporter1"},{"t":"transporter2"},{"t":"transporter3"}]'
     //const transportesList = JSON.parse(str)
-
-
-
-
-
-
-
 }
+
+
 
 export const upgradeLogIn = async (req, res) => {
     //RECIBIR EMAIL Y CONTRASEÑA DE ACCESO TEMPORAL
