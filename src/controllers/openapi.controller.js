@@ -14,17 +14,21 @@ import Jimp from 'jimp'
 import fs from 'fs'
 
 
-function sleep(ms) {
+/*function sleep(ms) {
     return new Promise((resolve) => {
         setTimeout(resolve, ms);
     });
-}
+}/*
 
 
 
 /*SELECT ALL AVAILABLE EVENTS */
 export const queryEventos = async (req, res) => {
-    const { specific, id } = req.body
+    const id  = req.params
+    let specific = 'NO'
+    if(id.length>1){
+        specific = 'YES'
+    }
     if (specific && id) {
         try {
             const pool = await getConnection()
@@ -596,7 +600,6 @@ export const reqUpgrade = async (req, res) => {
     //const str = '[{"t":"transporter1"},{"t":"transporter2"},{"t":"transporter3"}]'
     //const transportesList = JSON.parse(str)
 }
-
 
 
 export const upgradeLogIn = async (req, res) => {

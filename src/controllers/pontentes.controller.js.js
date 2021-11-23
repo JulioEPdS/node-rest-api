@@ -4,7 +4,12 @@ import { MAX } from 'mssql'
 
 //QUERYS PARA OBJETOS GET ALL///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 export const getPon = async (req, res) => {
-    const { specific, id } = req.body
+    const id  = req.params
+    let specific = 'NO'
+    if(id.length>1){
+        specific = 'YES'
+    }
+    
     if (specific && id) {
         try {
             const pool = await getConnection()
@@ -35,7 +40,6 @@ export const getPon = async (req, res) => {
 
 }
 
-
 //QUERYS INSERT PARA OBJETOS//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 export const createPon = async (req, res) => {
     try {
@@ -46,10 +50,10 @@ export const createPon = async (req, res) => {
             await pool
                 .request()
                 .input('id', sql.VarChar(255), id)
-                .input('nombre', sql.VarChar(20), nombre)
-                .input('apellido_p', sql.VarChar(20), apellido_p)
-                .input('apellido_m', sql.VarChar(20), apellido_m)
-                .input('email', sql.VarChar(80), email)
+                .input('nombre', sql.VarChar(50), nombre)
+                .input('apellido_p', sql.VarChar(50), apellido_p)
+                .input('apellido_m', sql.VarChar(50), apellido_m)
+                .input('email', sql.VarChar(100), email)
                 .input('user_id', sql.VarChar(255), user_id)
                 .execute('createPonente')
                 .then(result => {

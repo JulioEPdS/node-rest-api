@@ -17,7 +17,7 @@ const uploadBanner = multer({storage:banners})
 
 const router = Router()
 
-router.get('/', getEvents)
+router.get("/:id", getEvents)
 
 router.post('/',uploadBanner.single('banner'), postEvent)
 

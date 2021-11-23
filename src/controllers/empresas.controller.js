@@ -3,7 +3,12 @@ import { v4 as uuidv4 } from 'uuid'
 
 //QUERYS PARA OBJETOS GET ALL///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 export const getEmp = async (req, res) => {
-    const { specific, id } = req.body
+    const id  = req.params
+    let specific = 'NO'
+    if(id.length>1){
+        specific = 'YES'
+    }
+    
     if (specific && id) {
         try {
             const pool = await getConnection()
@@ -35,22 +40,21 @@ export const getEmp = async (req, res) => {
 
 }
 
-
 //QUERYS INSERT PARA OBJETOS//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 export const createEmp = async (req, res) => {
-    try {
-        const { name, girops, phone, representante, r_social, user_id } = req.body
-        if (name && girops && phone && representante && r_social && user_id) {
-            const id = uuidv4()
+    const id = uuidv4()
+    const { name, girops, phone, representante, r_social, user_id } = req.body
+    if (id && name && girops && phone && representante && r_social && user_id) {
+        try {
             const pool = await getConnection()
             await pool
                 .request()
                 .input('id', sql.VarChar(255), id)
                 .input('name', sql.VarChar(100), name)
                 .input('girops', sql.VarChar(255), girops)
-                .input('phone', sql.VarChar(20), phone)
+                .input('phone', sql.VarChar(255), phone)
                 .input('representante', sql.VarChar(80), representante)
-                .input('r_social', sql.VarChar(100), r_social)
+                .input('r_social', sql.VarChar(255), r_social)
                 .input('user_id', sql.VarChar(255), user_id)
                 .execute('createEmpresa')
                 .then(result => {
@@ -63,22 +67,68 @@ export const createEmp = async (req, res) => {
                         message: 'Registro de empresa fallida'
                     })
                 })
-        } else {
-            return res.status(400).json({
-                message: "No se proporcionó información completa"
+
+        }
+
+        catch (err) {
+            console.log(err)
+            console.log('Continuando ...')
+            return res.status(500).json({
+                message: 'ha ocurrido un error al ejecutar la creación de empresa'
             })
         }
-    } catch (err) {
-        console.log(err)
-        console.log('Continuando ...')
-        return res.status(500).json({
-            message: 'ha ocurrido un error al ejecutar la creación de empresa'
+    }
+
+    else {
+        return res.status(400).json({
+            message: "No se proporcionó información completa"
         })
     }
 }
 
 ///QUERYS UPDATE PARA OBJETOS/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 export const updateEmp = async (req, res) => {
+    const {id, name, girops, phone, representante, r_social, user_id } = req.body
+    if (id && name && girops && phone && representante && r_social && user_id) {
+        try {
+            const pool = await getConnection()
+            await pool
+                .request()
+                .input('id', sql.VarChar(255), id)
+                .input('name', sql.VarChar(100), name)
+                .input('girops', sql.VarChar(255), girops)
+                .input('phone', sql.VarChar(255), phone)
+                .input('representante', sql.VarChar(80), representante)
+                .input('r_social', sql.VarChar(100), r_social)
+                .input('user_id', sql.VarChar(255), user_id)
+                .execute('updateEmpresa')
+                .then(result => {
+                    if (result.returnValue == 200) {
+                        return res.status(result.returnValue).json({
+                            message: 'Se ha actualizado los datos de la empresa'
+                        })
+                    }
+                    return res.status(result.returnValue).json({
+                        message: 'Actualización de datos fallida'
+                    })
+                })
+
+        }
+
+        catch (err) {
+            console.log(err)
+            console.log('Continuando ...')
+            return res.status(500).json({
+                message: 'ha ocurrido un error al ejecutar la creación de empresa'
+            })
+        }
+    }
+
+    else {
+        return res.status(400).json({
+            message: "No se proporcionó información completa"
+        })
+    }
 }
 
 ///QUERYS DELETE PARA OBJETOS/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

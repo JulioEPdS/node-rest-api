@@ -1,3 +1,7 @@
+import checkAuth from './middleware/check-auth'
+import checkPartAuth from './middleware/check-part-auth'
+
+
 import express from 'express'
 import morgan from 'morgan'
 import cors from 'cors'
@@ -5,23 +9,30 @@ import helmet from 'helmet'
 import config from './config'
 import fs from 'fs'
 
-import checkAuth from './middleware/check-auth'
-import checkPartAuth from './middleware/check-part-auth'
 
 import eventsRoutes from './routes/events.routes'
 import usersRoutes from './routes/users.routes'
 import objectsRoutes from './routes/objects.routes'
 
-import participantsRoutes from './routes/participants.routes'
 
+import participantsRoutes from './routes/participants.routes'
 import publicRoutes from './routes/openapi.routes'
 
-import { crearDesdeBD, enviarDoc, imprimirdoc } from './controllers/impresordocumentos'
 
-//export let mailSending = {e1:0, e2:0}
-//PORCIÓN DE CÓDIGO QUE BLOQUEA TODO ACCESO A LA API QUE NO PROVENGA DE LA PÁGINA OFICIAL
-//Pero posible de evadir modificando el HEADER Origin en la request **VULNERABLE** pero 
-//mejor que tener la app sin el filtro de origen
+//PRUEBAS//////////////////////////////////////////////////////////////////////////////////
+//import { crearDesdeBD, enviarDoc, imprimirdoc } from './controllers/impresordocumentos'
+//PRUEBAS//////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+//PORCIÓN DE CÓDIGO QUE BLOQUEA TODO ACCESO A LA API QUE NO PROVENGA DE LA PÁGINA OFICIAL//
+/*****************************************************************************************/
+/* Pero posible de evadir modificando el HEADER Origin en la request **VULNERABLE** pero */
+/* mejor que tener la app sin el filtro de origen, OPENAPI routes sin embargo, son acce- */
+/* siblesa través de una vía pública, desde cualquier origen, bajo diferentes TOKENSyAUTH*/
+/*****************************************************************************************/
 const whitelist = ['http://localhost:3000', 'http://192.168.50.32:3000']
 
 const corsOptions = {
@@ -37,41 +48,51 @@ const corsOptions = {
 }
 
 
+
+
+//INICIALIZACIÓN DE LA API REST////////////////////////////////////////////////////////////
+/*****************************************************************************************/
+/* CARGAR LIBRERÍAS Y PREPARAR ENTORNO, CARGAR MIDLEWARES                                */
+/*****************************************************************************************/
 const app = express()
-
-// settings
+// settings////////////////////////////////////////////////////////////////////////////////
 app.set('port', config.port)
-
 app.use(cors())
 app.use(helmet())
 app.use(morgan('common'))
-
-
-// middlewares
+// middlewares/////////////////////////////////////////////////////////////////////////////
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 
-// routes
-//cors(corsOptions) se asegura de que exista un header de origen con la dirección del front-end !!NO ES UNA IMPLEMENTACIÓN ROBUSTA DE SEGURIDAD!!
-//checkAuth se asegura de que la solicitud contenga un JWT válido y que pertenezca a este servidor !!IMPLEMENTACIÓN DE SEGURIDAD!!
-app.use('/usuarios', cors(corsOptions), usersRoutes) //check auth dentro del router de registro/creación de usuarios
 
+
+// ROUTES O RUTAS, DEFINEN LAS DIFERENTES OPCIONES PRINCIPALES QUE HAY EN EL SERVER
+/******************************************************************************************/
+/* "cors(corsOptions)" se asegura de que el header de origen coincida con la dirección del*/
+/* front-end, sin embargo, !!NO ES UNA IMPLEMENTACIÓN ROBUSTA DE SEGURIDAD!!              */
+/* "checkAuth" se asegura de que la solicitud contenga un JWT válido y que pertenezca a 
+/* este servidor !!IMPLEMENTACIÓN DE SEGURIDAD POR MEDIO DE JWT!!                         */
+/******************************************************************************************/
+//check auth dentro del router /usuarios////////////////////////////////////////////////////
+app.use('/usuarios', cors(corsOptions), usersRoutes) 
 app.use('/eventos', cors(corsOptions), checkAuth, eventsRoutes)
 app.use('/objects', cors(corsOptions), checkAuth, objectsRoutes)
+//Ruta para los participantes registrados///////////////////////////////////////////////////
+app.use('/participantes', checkPartAuth, participantsRoutes)
+//unica ruta abierta al público **Inscripciones, registros, consulta , sin modificaciones///
+app.use('/client', publicRoutes) 
+//app.use('/informes', checkAuth,informRoutes) EN CONSTRUCCIÓN//////////////////////////////
 
-app.use('/participantes', checkPartAuth, participantsRoutes)//Ruta para los participantes registrados
-
-app.use('/client', publicRoutes) //unica ruta abierta al público **Inscripciones, registros, consulta global de eventos, sin modificaciones
-//app.use('/informes', checkAuth,informRoutes)
 
 
-/*#############################SEGMENTO DE PRUEBAS###############################################################*/
-//app.use('/imprime',enviarDoc) //IMPRIME TEXTO SOBRE IMÁGEN, IDEAL PARA GENERAR RECONOCIMIENTOS
-app.use('/creadesdebd', crearDesdeBD)
 
-/*#############################SEGMENTO DE PRUEBAS###############################################################*/
 
-//Handler for errors
+
+
+//ERROR HANDLING////////////////////////////////////////////////////////////////////////////
+/******************************************************************************************/
+/* En las líneas a continuacion se manejan los errores que pueden surgir durante ejecucion*/
+/******************************************************************************************/
 app.use((req, res, next) => {
     const error = new Error('Not found')
     error.status = 404
@@ -88,13 +109,18 @@ app.use((error, req, res, next) => {
 })
 
 
-/*setInterval(function(){
-    console.log('Han pasado 30 segundos...')
-},30*1000)*/
 
 
-setInterval(function () {
-    //const now = Date.now().toString()
+
+
+//VERIFICACIÓN PROGRAMADA///////////////////////////////////////////////////////////////////
+/******************************************************************************************/
+/* Dadas las políticas de envío masivo propuesto por los servicios de correo, es necesario*/
+/* contar con una estratégia que permita saber si los correos del sistema están dentro del*/
+/* margen aceptable de envíos diarios, cada 24 horas un correo puede recupera su capacidad*/
+/* base de 300 correos, después de 24hrs el sistema restablece el contador de emails.     */
+/******************************************************************************************/
+setInterval(function () {        
     fs.readFile('./state.txt', 'utf-8', (err, data) => {
 
         if (data) {
@@ -103,8 +129,7 @@ setInterval(function () {
             const d = new Date(dateinfile)
             const n = new Date(Date.now())
 
-            var seconds = (n.getTime() - d.getTime()) / 1000
-            //console.log('Han pasado ', seconds, ' desde que se escribió')
+            var seconds = (n.getTime() - d.getTime()) / 1000            
 
             if (seconds > (864*100)) {
                 let now = Date.now()
@@ -139,6 +164,16 @@ setInterval(function () {
     })
     
 }, (60*1000))
+
+
+
+
+
+//SEGMENTO DE PRUEBAS///////////////////////////////////////////////////////////////////////////
+//app.use('/imprime',enviarDoc) //IMPRIME TEXTO SOBRE IMÁGEN, IDEAL PARA GENERAR RECONOCIMIENTOS
+//app.use('/creadesdebd', crearDesdeBD)
+/*#############################SEGMENTO DE PRUEBAS############################################*/
+
 
 
 export default app

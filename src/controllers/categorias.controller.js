@@ -4,7 +4,11 @@ import { v4 as uuidv4 } from 'uuid'
 
 //QUERYS PARA OBJETOS GET ALL///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 export const getCat = async (req, res) => {
-    const { specific, id } = req.body
+    const id  = req.params
+    let specific = 'NO'
+    if(id.length>1){
+        specific = 'YES'
+    }
     if (specific && id) {
         try {
             const pool = await getConnection()
@@ -39,10 +43,10 @@ export const getCat = async (req, res) => {
 
 //QUERYS INSERT PARA OBJETOS//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 export const createCat = async (req, res) => {
-    try {
-        const { name, description, color, icon, user_id } = req.body
-        if (name && description && color && icon && user_id) {
-            const id = uuidv4()
+    const id = uuidv4()
+    const { name, description, color, icon, user_id } = req.body
+    if (id && name && description && color && icon && user_id) {
+        try {            
             const pool = await getConnection()
             await pool
                 .request()
@@ -66,23 +70,64 @@ export const createCat = async (req, res) => {
 
                 })
         }
-        else {
-            return res.status(400).json({
-                message: "No se proporcionó información completa"
+
+        catch (err) {
+            console.log(err)
+            console.log('Continuando ...')
+            return res.status(500).json({
+                message: 'ha ocurrido un error al ejecutar la creación de categoría'
             })
         }
-
-    } catch (err) {
-        console.log(err)
-        console.log('Continuando ...')
-        return res.status(500).json({
-            message: 'ha ocurrido un error al ejecutar la creación de categoría'
+    }
+    else {
+        return res.status(400).json({
+            message: "No se proporcionó información completa"
         })
     }
 }//READY
 
 ///QUERYS UPDATE PARA OBJETOS/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-export const updateCat = async (req, res) => { }
+export const updateCat = async (req, res) => {
+    const { id, name, description, color, icon, user_id } = req.body
+    if (id && name && description && color && icon && user_id) {
+        try {
+            const pool = await getConnection()
+            await pool
+                .request()
+                .input('id', sql.VarChar(255), id)
+                .input('name', sql.VarChar(20), name)
+                .input('description', sql.VarChar(255), description)
+                .input('color', sql.VarChar(20), color)
+                .input('icon', sql.VarChar(20), icon)
+                .input('user_id', sql.VarChar(255), user_id)
+                .execute('updateCategoria')
+                .then(result => {
+                    if (result.returnValue == 200) {
+                        return res.status(result.returnValue).json({
+                            message: 'Se actualizó la categoría'
+                        })
+                    }
+                    //When we get a negative response from SP
+                    return res.status(result.returnValue).json({
+                        message: 'Actualización de categoría fallida'
+                    })
+
+                })
+
+        } catch (err) {
+            console.log(err)
+            console.log('Continuando ...')
+            return res.status(500).json({
+                message: 'ha ocurrido un error al ejecutar la actualización de categoría'
+            })
+        }
+    }
+    else {
+        return res.status(400).json({
+            message: "No se proporcionó información completa"
+        })
+    }
+}
 
 ///QUERYS DELETE PARA OBJETOS/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 export const deleteCat = async (req, res) => { }
