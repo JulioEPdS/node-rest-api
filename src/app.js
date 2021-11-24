@@ -20,7 +20,7 @@ import publicRoutes from './routes/openapi.routes'
 
 
 //PRUEBAS//////////////////////////////////////////////////////////////////////////////////
-//import { crearDesdeBD, enviarDoc, imprimirdoc } from './controllers/impresordocumentos'
+import { crearDesdeBD, enviarDoc, imprimirdoc } from './controllers/impresordocumentos'
 //PRUEBAS//////////////////////////////////////////////////////////////////////////////////
 
 
@@ -31,7 +31,7 @@ import publicRoutes from './routes/openapi.routes'
 /*****************************************************************************************/
 /* Pero posible de evadir modificando el HEADER Origin en la request **VULNERABLE** pero */
 /* mejor que tener la app sin el filtro de origen, OPENAPI routes sin embargo, son acce- */
-/* siblesa través de una vía pública, desde cualquier origen, bajo diferentes TOKENSyAUTH*/
+/* sibles a través de una vía pública, desde cualquier origen,bajo diferentes TOKENSyAUTH*/
 /*****************************************************************************************/
 const whitelist = ['http://localhost:3000', 'http://192.168.50.32:3000']
 
@@ -57,10 +57,10 @@ const corsOptions = {
 const app = express()
 // settings////////////////////////////////////////////////////////////////////////////////
 app.set('port', config.port)
+// middlewares/////////////////////////////////////////////////////////////////////////////
 app.use(cors())
 app.use(helmet())
 app.use(morgan('common'))
-// middlewares/////////////////////////////////////////////////////////////////////////////
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 
@@ -70,20 +70,23 @@ app.use(express.urlencoded({ extended: false }))
 /******************************************************************************************/
 /* "cors(corsOptions)" se asegura de que el header de origen coincida con la dirección del*/
 /* front-end, sin embargo, !!NO ES UNA IMPLEMENTACIÓN ROBUSTA DE SEGURIDAD!!              */
-/* "checkAuth" se asegura de que la solicitud contenga un JWT válido y que pertenezca a 
+/* "checkAuth" se asegura de que la solicitud contenga un JWT válido y que pertenezca a   */
 /* este servidor !!IMPLEMENTACIÓN DE SEGURIDAD POR MEDIO DE JWT!!                         */
 /******************************************************************************************/
 //check auth dentro del router /usuarios////////////////////////////////////////////////////
 app.use('/usuarios', cors(corsOptions), usersRoutes) 
 app.use('/eventos', cors(corsOptions), checkAuth, eventsRoutes)
 app.use('/objects', cors(corsOptions), checkAuth, objectsRoutes)
-//Ruta para los participantes registrados///////////////////////////////////////////////////
+//Ruta para los participantes registrados///////////////////////////////////////////////////////
 app.use('/participantes', checkPartAuth, participantsRoutes)
-//unica ruta abierta al público **Inscripciones, registros, consulta , sin modificaciones///
+//unica ruta abierta al público **Inscripciones, registros, consulta , sin modificaciones///////
 app.use('/client', publicRoutes) 
-//app.use('/informes', checkAuth,informRoutes) EN CONSTRUCCIÓN//////////////////////////////
+//app.use('/informes', checkAuth,informRoutes) EN CONSTRUCCIÓN//////////////////////////////////
 
-
+//SEGMENTO DE PRUEBAS///////////////////////////////////////////////////////////////////////////
+//app.use('/imprime',enviarDoc) //IMPRIME TEXTO SOBRE IMÁGEN, IDEAL PARA GENERAR RECONOCIMIENTOS
+//app.use('/creadesdebd', crearDesdeBD)
+/*#############################SEGMENTO DE PRUEBAS############################################*/
 
 
 
@@ -120,6 +123,7 @@ app.use((error, req, res, next) => {
 /* margen aceptable de envíos diarios, cada 24 horas un correo puede recupera su capacidad*/
 /* base de 300 correos, después de 24hrs el sistema restablece el contador de emails.     */
 /******************************************************************************************/
+//CONFORME A LO QUE SE DISCUTIÓ EL 23/11/2021, SE MODIFICARÁ ESTA APROXIMACIÓN
 setInterval(function () {        
     fs.readFile('./state.txt', 'utf-8', (err, data) => {
 
@@ -169,10 +173,7 @@ setInterval(function () {
 
 
 
-//SEGMENTO DE PRUEBAS///////////////////////////////////////////////////////////////////////////
-//app.use('/imprime',enviarDoc) //IMPRIME TEXTO SOBRE IMÁGEN, IDEAL PARA GENERAR RECONOCIMIENTOS
-//app.use('/creadesdebd', crearDesdeBD)
-/*#############################SEGMENTO DE PRUEBAS############################################*/
+
 
 
 
