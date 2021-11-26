@@ -253,7 +253,7 @@ export const querySignup = async (req, res) => {
                     })
                 })
         } catch (error) {
-            console.log(err)
+            console.log(error)
             console.log('Continuando ...')
             return res.status(500).json({
                 error: {
