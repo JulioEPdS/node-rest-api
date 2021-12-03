@@ -77,11 +77,15 @@ app.use(express.urlencoded({ extended: false }))
 app.use('/usuarios', cors(corsOptions), usersRoutes) 
 app.use('/eventos', cors(corsOptions), checkAuth, eventsRoutes)
 app.use('/objects', cors(corsOptions), checkAuth, objectsRoutes)
+//app.use('/informes', checkAuth,informRoutes) EN CONSTRUCCIÓN//////////////////////////////////
+
+
+//RUTAS DE API PÚBLICA, PARA APLICACIÓN MÓVIL Y CUALQUIER OTRO DESARROLLO///////////////////////
 //Ruta para los participantes registrados///////////////////////////////////////////////////////
 app.use('/participantes', checkPartAuth, participantsRoutes)
 //unica ruta abierta al público **Inscripciones, registros, consulta , sin modificaciones///////
 app.use('/client', publicRoutes) 
-//app.use('/informes', checkAuth,informRoutes) EN CONSTRUCCIÓN//////////////////////////////////
+
 
 //SEGMENTO DE PRUEBAS///////////////////////////////////////////////////////////////////////////
 //app.use('/imprime',enviarDoc) //IMPRIME TEXTO SOBRE IMÁGEN, IDEAL PARA GENERAR RECONOCIMIENTOS
