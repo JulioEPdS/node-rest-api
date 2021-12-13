@@ -88,7 +88,7 @@ app.use('/client', publicRoutes)
 
 
 //SEGMENTO DE PRUEBAS///////////////////////////////////////////////////////////////////////////
-//app.use('/imprime',enviarDoc) //IMPRIME TEXTO SOBRE IMÁGEN, IDEAL PARA GENERAR RECONOCIMIENTOS
+app.use('/imprime',enviarDoc) //IMPRIME TEXTO SOBRE IMÁGEN, IDEAL PARA GENERAR RECONOCIMIENTOS
 //app.use('/creadesdebd', crearDesdeBD)
 /*#############################SEGMENTO DE PRUEBAS############################################*/
 

@@ -16,12 +16,12 @@ export const imprimirdoc = async (textBeforeType, documentType, alternativeDocum
 
 
     //const font = await Jimp.loadFont(Jimp.FONT_SANS_32_BLACK);
-    const textBeforeTypeFont = await Jimp.loadFont('./uploads/fonts/LATO_21_GREY_BOLD.fnt')
-    const documentTypeFont = await Jimp.loadFont('./uploads/fonts/LATO_68_CAFE.fnt')
-    const nombrePersonaFont = await Jimp.loadFont('./uploads/fonts/LATO_28_DARK_BOLD.fnt')
-    const textoSecundarioFont = await Jimp.loadFont('./uploads/fonts/LATO_30_GREY_LIGHT.fnt')
-    const eventNameFont = await Jimp.loadFont('./uploads/fonts/LATO_30_GREY_BOLD.fnt')
-    const dateAndPlaceFont = await Jimp.loadFont('./uploads/fonts/LATO_16_DARK_BOLD.fnt')
+    const textBeforeTypeFont = await Jimp.loadFont('./fonts/LATO_21_GREY_BOLD.fnt')
+    const documentTypeFont = await Jimp.loadFont('./fonts/LATO_68_CAFE.fnt')
+    const nombrePersonaFont = await Jimp.loadFont('./fonts/LATO_28_DARK_BOLD.fnt')
+    const textoSecundarioFont = await Jimp.loadFont('./fonts/LATO_30_GREY_LIGHT.fnt')
+    const eventNameFont = await Jimp.loadFont('./fonts/LATO_30_GREY_BOLD.fnt')
+    const dateAndPlaceFont = await Jimp.loadFont('./fonts/LATO_16_DARK_BOLD.fnt')
 
 
     /*for(var i in personas){
@@ -212,12 +212,12 @@ export async function crearDesdeBD(req, res) {
         //const ruta = './uploads/constancias/Constancia.png' LA OBTENEMOS DESDE LA CONSULTA
         console.log(config)
         const image = await Jimp.read(ruta)
-        const textBeforeTypeFont = await Jimp.loadFont(config?.textBeforeTypeFont || './uploads/fonts/LATO_21_GREY_BOLD.fnt')
-        const documentTypeFont = await Jimp.loadFont(config?.documentTypeFont || './uploads/fonts/LATO_68_CAFE.fnt')
-        const nombrePersonaFont = await Jimp.loadFont(config?.nombrePersonaFont || './uploads/fonts/LATO_28_DARK_BOLD.fnt')
-        const textoSecundarioFont = await Jimp.loadFont(config?.textoSecundarioFont || './uploads/fonts/LATO_30_GREY_LIGHT.fnt')
-        const eventNameFont = await Jimp.loadFont(config?.eventNameFont || './uploads/fonts/LATO_30_GREY_BOLD.fnt')
-        const dateAndPlaceFont = await Jimp.loadFont(config?.dateAndPlaceFont || './uploads/fonts/LATO_16_DARK_BOLD.fnt')
+        const textBeforeTypeFont = await Jimp.loadFont(config?.textBeforeTypeFont || './fonts/LATO_21_GREY_BOLD.fnt')
+        const documentTypeFont = await Jimp.loadFont(config?.documentTypeFont || './fonts/LATO_68_CAFE.fnt')
+        const nombrePersonaFont = await Jimp.loadFont(config?.nombrePersonaFont || '.fonts/LATO_28_DARK_BOLD.fnt')
+        const textoSecundarioFont = await Jimp.loadFont(config?.textoSecundarioFont || './fonts/LATO_30_GREY_LIGHT.fnt')
+        const eventNameFont = await Jimp.loadFont(config?.eventNameFont || './fonts/LATO_30_GREY_BOLD.fnt')
+        const dateAndPlaceFont = await Jimp.loadFont(config?.dateAndPlaceFont || './fonts/LATO_16_DARK_BOLD.fnt')
         
 
         if (config?.textBeforeType === 'true') {

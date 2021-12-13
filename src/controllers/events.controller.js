@@ -193,7 +193,7 @@ export const patchEvent = async (req, res) => {
                 .input('formulario', sql.VarChar(255), formulario)
                 .input('text_mail', sql.NVarChar(MAX), text_mail)
                 .input('user_id', sql.VarChar(255), user_id)
-                .execute('createEvento')
+                .execute('updateEvento')
                 .then(result => {
                     if (result.returnValue == 201) {
                         return res.status(result.returnValue).json({
@@ -224,7 +224,7 @@ export const patchEvent = async (req, res) => {
 }
 
 
-/*
+
 export const deleteEvent = async (req,res) => {
 
-}*/
+}

@@ -14,17 +14,14 @@ const banners = multer.diskStorage({
 
 const uploadBanner = multer({storage:banners})
 
-
 const router = Router()
 
 router.get("/:id", getEvents)
 
 router.post('/',uploadBanner.single('banner'), postEvent)
 
-//router.get('/:eventId',  getDefinedEvent)
+router.post('/delete/:eventId', deleteEvent)
 
-//router.delete('/:eventId', deleteEvent)
-
-//router.patch('/:eventId', patchEvent)
+router.post('/update/:eventId', patchEvent)
 
 export default router

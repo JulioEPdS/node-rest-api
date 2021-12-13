@@ -25,7 +25,7 @@ router.post('/registro', queryRegistro)
 
 router.post('/signup', querySignup)
 
-router.post('/validacion',queryValid)
+//router.post('/validacion',queryValid)
 
 router.post('/inscripcion', queryInscript)
 
@@ -40,9 +40,9 @@ router.post('/editardatos', checkPartAuth,editarDatosControlled)
 
 
 //PARA REALIZAR UN UPGRADE DE CUENTA
-router.post('/upgradeMe', reqUpgrade)
-router.post('/upgradeLogin', upgradeLogIn)
-router.post('/upgrade', checkPartAuth ,Upgrade)
+//router.post('/upgradeMe', reqUpgrade)
+//router.post('/upgradeLogin', upgradeLogIn)
+//router.post('/upgrade', checkPartAuth ,Upgrade)
 
 
 export default router
