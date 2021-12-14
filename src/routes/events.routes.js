@@ -20,8 +20,8 @@ router.get("/:id", getEvents)
 
 router.post('/',uploadBanner.single('banner'), postEvent)
 
-router.post('/delete/:eventId', deleteEvent)
+//router.post('/delete/:eventId', deleteEvent)
 
-router.post('/update/:eventId', patchEvent)
+//router.post('/update/:eventId', patchEvent)
 
 export default router
