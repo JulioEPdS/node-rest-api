@@ -4,9 +4,9 @@ import { v4 as uuidv4 } from 'uuid'
 
 //QUERYS PARA OBJETOS GET ALL///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 export const getCat = async (req, res) => {
-    const id  = req.params
+    const id = req.params.id
     let specific = 'NO'
-    if(id.length>1){
+    if (id.length > 1) {
         specific = 'YES'
     }
     if (specific && id) {
@@ -19,7 +19,7 @@ export const getCat = async (req, res) => {
                 .execute('getCategorias')
                 .then(result => {
                     return res.status(200).json(
-                        result.recordset
+                        result.recordsets
                     )
                 })
 
@@ -46,7 +46,7 @@ export const createCat = async (req, res) => {
     const id = uuidv4()
     const { name, description, color, icon, user_id } = req.body
     if (id && name && description && color && icon && user_id) {
-        try {            
+        try {
             const pool = await getConnection()
             await pool
                 .request()
@@ -127,7 +127,35 @@ export const updateCat = async (req, res) => {
             message: "No se proporcionó información completa"
         })
     }
-}
+}//READY
 
 ///QUERYS DELETE PARA OBJETOS/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-export const deleteCat = async (req, res) => { }
+export const deleteCat = async (req, res) => {
+    const id = req.params.id
+
+    const pool = await getConnection()
+    await pool
+        .request()
+        .input('id', sql.VarChar(255), id)
+        .execute('del_cat')
+        .then(
+            (result) => {                                
+                return res.status(result.returnValue).json({
+                    message: 'categoría deshabilitada'
+                })
+            },
+            (error) => {                
+                console.log('Continuando ...')
+                return res.status(500).json({
+                    message: 'ha ocurrido un error al intentar deshabilitar la categoría'
+                })
+            }
+        )
+        .catch((error) => {            
+            console.log('Continuando ...')
+            return res.status(500).json({
+                message: 'ha ocurrido un error al intentar deshabilitar la categoría'
+            })
+        })
+
+}//READY

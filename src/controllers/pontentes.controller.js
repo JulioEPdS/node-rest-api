@@ -4,12 +4,12 @@ import { MAX } from 'mssql'
 
 //QUERYS PARA OBJETOS GET ALL///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 export const getPon = async (req, res) => {
-    const id  = req.params
+    const id = req.params.id
     let specific = 'NO'
-    if(id.length>1){
+    if (id.length > 1) {
         specific = 'YES'
     }
-    
+
     if (specific && id) {
         try {
             const pool = await getConnection()
@@ -81,12 +81,76 @@ export const createPon = async (req, res) => {
             message: 'ha ocurrido un error al ejecutar la creación de ponente'
         })
     }
-}
+}//READY
 
 ///QUERYS UPDATE PARA OBJETOS/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 export const updatePon = async (req, res) => {
+    try {
+        const { id, nombre, apellido_p, apellido_m, email, user_id } = req.body
+        if (id && nombre && apellido_p && apellido_m && email && user_id) {
+            const pool = await getConnection()
+            await pool
+                .request()
+                .input('id', sql.VarChar(255), id)
+                .input('nombre', sql.VarChar(50), nombre)
+                .input('apellido_p', sql.VarChar(50), apellido_p)
+                .input('apellido_m', sql.VarChar(50), apellido_m)
+                .input('email', sql.VarChar(100), email)
+                .input('user_id', sql.VarChar(255), user_id)
+                .execute('updatePonente')
+                .then(result => {
+                    if (result.returnValue == 200) {
+                        return res.status(result.returnValue).json({
+                            message: 'Se ha actualizado la información del ponente'
+                        })
+                    }
+                    //When we get a negative response from SP
+                    return res.status(result.returnValue).json({
+                        message: 'Actualización de información fallida'
+                    })
+
+                })
+        }
+        else {
+            return res.status(400).json({
+                message: "No se proporcionó información completa"
+            })
+        }
+    } catch (err) {
+        console.log(err)
+        console.log('Continuando ...')
+        return res.status(500).json({
+            message: 'ha ocurrido un error al ejecutar la actualización'
+        })
+    }
 }
 
 ///QUERYS DELETE PARA OBJETOS/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 export const deletePon = async (req, res) => {
+    const id = req.params.id
+
+    const pool = await getConnection()
+    await pool
+        .request()
+        .input('id', sql.VarChar(255), id)
+        .execute('del_ponent')
+        .then(
+            (result) => {
+                return res.status(result.returnValue).json({
+                    message: 'ponente deshabilitado'
+                })
+            },
+            (error) => {
+                console.log('Continuando ...')
+                return res.status(500).json({
+                    message: 'ha ocurrido un error al intentar deshabilitar al ponente'
+                })
+            }
+        )
+        .catch((error) => {
+            console.log('Continuando ...')
+            return res.status(500).json({
+                message: 'ha ocurrido un error al intentar deshabilitar al ponente'
+            })
+        })
 }

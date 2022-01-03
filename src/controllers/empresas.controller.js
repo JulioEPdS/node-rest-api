@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid'
 
 //QUERYS PARA OBJETOS GET ALL///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 export const getEmp = async (req, res) => {
-    const id  = req.params
+    const id  = req.params.id
     let specific = 'NO'
     if(id.length>1){
         specific = 'YES'
@@ -38,7 +38,7 @@ export const getEmp = async (req, res) => {
         })
     }
 
-}
+}//READY
 
 //QUERYS INSERT PARA OBJETOS//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 export const createEmp = async (req, res) => {
@@ -84,7 +84,7 @@ export const createEmp = async (req, res) => {
             message: "No se proporcionó información completa"
         })
     }
-}
+}//READY
 
 ///QUERYS UPDATE PARA OBJETOS/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 export const updateEmp = async (req, res) => {
@@ -129,8 +129,34 @@ export const updateEmp = async (req, res) => {
             message: "No se proporcionó información completa"
         })
     }
-}
+}//READY
 
 ///QUERYS DELETE PARA OBJETOS/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 export const deleteEmp = async (req, res) => {
-}
+    const id = req.params.id
+
+    const pool = await getConnection()
+    await pool
+        .request()
+        .input('id', sql.VarChar(255), id)
+        .execute('del_emp')
+        .then(
+            (result) => {                                
+                return res.status(result.returnValue).json({
+                    message: 'empresa deshabilitada'
+                })
+            },
+            (error) => {                
+                console.log('Continuando ...')
+                return res.status(500).json({
+                    message: 'ha ocurrido un error al intentar deshabilitar la empresa'
+                })
+            }
+        )
+        .catch((error) => {            
+            console.log('Continuando ...')
+            return res.status(500).json({
+                message: 'ha ocurrido un error al intentar deshabilitar la empresa'
+            })
+        })
+}//READY

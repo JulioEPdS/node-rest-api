@@ -5,7 +5,7 @@ import { createCat, getCat, updateCat, deleteCat } from '../controllers/categori
 import { createCert, getCert, updateCert, deleteCert } from '../controllers/certdocs.controller'
 import { createEmp, getEmp, updateEmp, deleteEmp } from '../controllers/empresas.controller'
 import { createForm, getForm, updateForm, deleteForm } from '../controllers/formularios.controller'
-import { createPon, getPon, updatePon, deletePon } from '../controllers/pontentes.controller.js'
+import { createPon, getPon, updatePon, deletePon } from '../controllers/pontentes.controller'
 
 //import multer from 'multer' ¡¡DEPRECATED!!, INCLUSIÓN DE UN MIDDLEWARE PARA MANEJAR SUBIDA DE ARCHIVOS
 //IMPORT  DE MIDDLEWARE PARA MANEJAR SUBIDA DE DATOS

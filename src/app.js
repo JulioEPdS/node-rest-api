@@ -158,6 +158,7 @@ setInterval(function () {
         else {
             let now = Date.now()
             let fecha = now.toString()
+            //La definición a continuación considera que existen 6 direcciones de correo configuradas
             let str = { "date": fecha, "0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0 }
             let newData = JSON.stringify(str)
             fs.writeFile('./state.txt', newData, function (err) {
