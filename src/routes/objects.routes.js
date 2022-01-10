@@ -2,7 +2,7 @@ import { Router } from 'express'
 
 //CONTROLADORES NECESARIOS//////////////////////////////////////////////////////////////////////////
 import { createCat, getCat, updateCat, deleteCat } from '../controllers/categorias.controller'
-import { createCert, getCert, updateCert, deleteCert } from '../controllers/certdocs.controller'
+import { createCert, getCert, updateCert, deleteCert, getBase } from '../controllers/certdocs.controller'
 import { createEmp, getEmp, updateEmp, deleteEmp } from '../controllers/empresas.controller'
 import { createForm, getForm, updateForm, deleteForm } from '../controllers/formularios.controller'
 import { createPon, getPon, updatePon, deletePon } from '../controllers/pontentes.controller'
@@ -12,6 +12,10 @@ import { createPon, getPon, updatePon, deletePon } from '../controllers/pontente
 import { uploadC } from '../middleware/file-receiver'
 
 import { getAllObjects } from '../controllers/ovacpages.controller'
+
+
+
+
 
 
 const router = Router()
@@ -31,6 +35,7 @@ router.get('/allobjects', getAllObjects)
 /****************************************************************************************/
 router.get('/categorias/:id', getCat)
 router.get('/certdocs/:id', getCert)
+router.get('/certdocs/base/:id',getBase)
 router.get('/empresas/:id', getEmp)
 router.get('/formularios/:id', getForm)
 router.get('/ponentes/:id', getPon)
@@ -58,7 +63,7 @@ router.post('/ponente', createPon)
 /* */
 /****************************************************************************************/
 router.put('/categorias/update', updateCat)
-router.put('/certdocs/update', updateCert)
+router.put('/certdocs/update', uploadC, updateCert)
 router.put('/empresas/update', updateEmp)
 router.put('/formularios/update', updateForm)
 router.put('/ponentes/update', updatePon)

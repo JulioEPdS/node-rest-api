@@ -24,21 +24,6 @@ export const imprimirdoc = async (textBeforeType, documentType, alternativeDocum
     const dateAndPlaceFont = await Jimp.loadFont('./fonts/LATO_16_DARK_BOLD.fnt')
 
 
-    /*for(var i in personas){
-        const ruta = './constancia.jpg'
-        const image = await Jimp.read(ruta);
-        image.print(
-            font,
-            215,
-            370,
-            personas[i].nombre,
-            900,            
-        )
-        let rutasalida = './reconocimiento'+personas[i].nombre+'.png'
-        await image.writeAsync(rutasalida)
-        //console.log(personas[i].nombre)
-    }*/
-
 
     const ruta = './uploads/constancias/Constancia.png'
     const image = await Jimp.read(ruta)
@@ -47,34 +32,34 @@ export const imprimirdoc = async (textBeforeType, documentType, alternativeDocum
     //IMPRIME "OTORGA LA O EL"
     image.print(
         textBeforeTypeFont,
-        153,//Posición en X px
+        78,//Posición en X px
         231,//Posición en Y px
         {
             text: textBeforeType,
             alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER
         },
         //Ancho del área
-        700
+        856
     )
 
     //IMPRIME TIPO DE DOCUMENTO
     image.print(
         documentTypeFont,
-        153,//Posición en X px
+        78,//Posición en X px
         261,//Posición en Y px
         {
             text: documentType,
             alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER
         },
         //Ancho del área
-        700
+        856
 
     )
 
     //IMPRIME NOMBRE
     image.print(
         nombrePersonaFont,
-        206,
+        206,//POR FAVOR CONSIDERE EL INICIO DE LA LINEA PARA EL NOMBRE DE PERSONA
         374,
         {
             text: nombrePersona,
@@ -87,40 +72,39 @@ export const imprimirdoc = async (textBeforeType, documentType, alternativeDocum
     //IMPRIME TEXTO SECUNDARIO
     image.print(
         textoSecundarioFont,
-        153,
+        78,
         430,
         {
             text: textoSecundario,
             alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER
         },
-        700,
+        856,
 
     )
 
     //IMPRIME NOMBRE DEL EVENTO
     image.print(
         eventNameFont,
-        153,
+        78,
         468,
         {
             text: '"' + eventName + '"',
             alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER,
             alignmentY: Jimp.VERTICAL_ALIGN_MIDDLE
         },
-        700,
-        100
+        856
     )
 
     //IMPRIME LUGAR Y FECHA
     image.print(
         dateAndPlaceFont,
-        279,
+        78,
         577,
         {
             text: dateAndPlace,
             alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER
         },
-        445
+        856
     )
 
     let rutasalida = './constancias/' + documentType + '-' + eventName + '-' + nombrePersona + '.png'
@@ -163,7 +147,7 @@ export async function enviarDoc(req, res) {
 
 
 export async function crearDesdeBD(req, res) {
-    const id = req.body.id
+    const id  = req.body.id
     let config = []
     let ruta = ''    
 
@@ -214,7 +198,7 @@ export async function crearDesdeBD(req, res) {
         const image = await Jimp.read(ruta)
         const textBeforeTypeFont = await Jimp.loadFont(config?.textBeforeTypeFont || './fonts/LATO_21_GREY_BOLD.fnt')
         const documentTypeFont = await Jimp.loadFont(config?.documentTypeFont || './fonts/LATO_68_CAFE.fnt')
-        const nombrePersonaFont = await Jimp.loadFont(config?.nombrePersonaFont || '.fonts/LATO_28_DARK_BOLD.fnt')
+        const nombrePersonaFont = await Jimp.loadFont(config?.nombrePersonaFont || './fonts/LATO_28_DARK_BOLD.fnt')
         const textoSecundarioFont = await Jimp.loadFont(config?.textoSecundarioFont || './fonts/LATO_30_GREY_LIGHT.fnt')
         const eventNameFont = await Jimp.loadFont(config?.eventNameFont || './fonts/LATO_30_GREY_BOLD.fnt')
         const dateAndPlaceFont = await Jimp.loadFont(config?.dateAndPlaceFont || './fonts/LATO_16_DARK_BOLD.fnt')
@@ -224,7 +208,7 @@ export async function crearDesdeBD(req, res) {
             //IMPRIME "OTORGA LA O EL"
             image.print(
                 textBeforeTypeFont,
-                parseInt(config?.textBeforeTypeX) || 153,//Posición en X px
+                parseInt(config?.textBeforeTypeX) || 78,//Posición en X px
                 parseInt(config?.textBeforeTypeY) || 231,//Posición en Y px
                 {
                     text: config.textBeforeTypeContent,
@@ -232,7 +216,7 @@ export async function crearDesdeBD(req, res) {
                     alignmentY: Jimp.VERTICAL_ALIGN_MIDDLE
                 },
                 //Ancho del área
-                parseInt(config?.textBeforeTypeW) || 700,
+                parseInt(config?.textBeforeTypeW) || 856,
                 parseInt(config?.textBeforeTypeH) || 40
             )
         }
@@ -241,7 +225,7 @@ export async function crearDesdeBD(req, res) {
         if (config?.documentType === 'true') {
             image.print(
                 documentTypeFont,
-                parseInt(config?.documentTypeX) || 153,//Posición en X px
+                parseInt(config?.documentTypeX) || 78,//Posición en X px
                 parseInt(config?.documentTypeY) || 261,//Posición en Y px
                 {
                     text: config.documentTypeContent,
@@ -249,7 +233,7 @@ export async function crearDesdeBD(req, res) {
                     alignmentY: Jimp.VERTICAL_ALIGN_MIDDLE
                 },
                 //Ancho del área
-                parseInt(config?.documentTypeW) || 700,
+                parseInt(config?.documentTypeW) || 856,
                 parseInt(config?.documentTypeW) || 80
 
             )
@@ -260,7 +244,8 @@ export async function crearDesdeBD(req, res) {
             //IMPRIME NOMBRE
             image.print(
                 nombrePersonaFont,
-                parseInt(config?.nombrePersonaX) || 206,
+                //AL EDITAR EL VALOR POR DEFECTO CONSIDERE EL INICIO DE LINEA DEL NOMBRE
+                parseInt(config?.nombrePersonaX) || 206, 
                 parseInt(config?.nombrePersonaY) || 374,
                 {
                     text: nombrePersona,
@@ -277,14 +262,14 @@ export async function crearDesdeBD(req, res) {
             //IMPRIME TEXTO SECUNDARIO
             image.print(
                 textoSecundarioFont,
-                parseInt(config?.textoSecundarioX) || 153,
+                parseInt(config?.textoSecundarioX) || 78,
                 parseInt(config?.textoSecundarioY) || 430,
                 {
                     text: config.textoSecundarioContent,
                     alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER,
                     alignmentY: Jimp.VERTICAL_ALIGN_MIDDLE
                 },
-                parseInt(config?.textoSecundarioW) || 700,
+                parseInt(config?.textoSecundarioW) || 856,
                 parseInt(config?.textoSecundarioH) || 40
             )
         }
@@ -293,14 +278,14 @@ export async function crearDesdeBD(req, res) {
             //IMPRIME NOMBRE DEL EVENTO
             image.print(
                 eventNameFont,
-                parseInt(config?.eventNameX) || 153,
+                parseInt(config?.eventNameX) || 78,
                 parseInt(config?.eventNameY) || 468,
                 {
                     text: '"' + eventName + '"',
                     alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER,
                     alignmentY: Jimp.VERTICAL_ALIGN_MIDDLE
                 },
-                parseInt(config?.eventNameW) || 700,
+                parseInt(config?.eventNameW) || 856,
                 parseInt(config?.eventNameH) || 100
             )
         }
@@ -309,14 +294,14 @@ export async function crearDesdeBD(req, res) {
             //IMPRIME LUGAR Y FECHA
             image.print(
                 dateAndPlaceFont,
-                parseInt(config?.dateAndPlaceX) || 279,
+                parseInt(config?.dateAndPlaceX) || 78,
                 parseInt(config?.dateAndPlaceY) || 577,
                 {
                     text: dateAndPlace,
                     alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER,
                     alignmentY: Jimp.VERTICAL_ALIGN_MIDDLE
                 },
-                parseInt(config?.dateAndPlaceW) || 445,
+                parseInt(config?.dateAndPlaceW) || 856,
                 parseInt(config?.dateAndPlaceH) || 30
             )
         }

@@ -4,7 +4,7 @@ import { MAX } from 'mssql'
 
 //Handles get method for all events ordered by ###############################################################
 export const getEvents = async (req, res) => {
-    const id  = req.params
+    const id  = req.params.id
     let specific = 'NO'
     if(id.length>1){
         specific = 'YES'
@@ -42,44 +42,30 @@ export const getEvents = async (req, res) => {
 export const postEvent = async (req, res) => {
     const id = uuidv4()
     const {
-        title,
-        type,
-        project_type,
-        description,
-        duration,
-        start_date,
-        end_date,
-        horarios,
-        certdoc_id,
-        ponente_id,
-        organismo,
-        beneficiados,
-        liga,
-        formulario,
-        text_mail,
+        title,        
         user_id,
     } = req.body
 
-    const banner = req.file.path //MEJOR PONER ESTO APARTE 
+    const banner = req.file?.path || null //MEJOR PONER ESTO APARTE 
 
-    if (id &&
-        title &&
-        type &&
-        project_type &&
-        description &&
-        duration &&
-        start_date &&
-        end_date &&
-        horarios &&
-        certdoc_id &&
-        ponente_id &&
-        organismo &&
-        beneficiados &&
-        banner &&
-        liga &&
-        formulario &&
-        text_mail &&
-        user_id) {
+    if (id && title  && user_id){
+
+        //READ OR SET NULL        
+        const type = req.body.type || null
+        const project_type = req.body.project_type || null
+        const description = req.body.description || null
+        const duration = req.body.duration || null
+        const start_date = req.body.start_date || null 
+        const end_date = req.body.end_date || null
+        const horarios = req.body. horarios || null
+        const certdoc_id = req.body.certdoc_id || null
+        const ponente_id = req.body.ponente_id || null
+        const organismo = req.body.organismo || null
+        const beneficiados = req.body.beneficiados || null        
+        const liga = req.body.liga || null
+        const formulario = req.body.formulario || null
+        const text_mail = req.body.text_mail || null        
+
         try {
             const pool = await getConnection()
             await pool

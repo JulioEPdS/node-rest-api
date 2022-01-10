@@ -4,7 +4,7 @@ import { MAX } from 'mssql'
 
 //QUERYS PARA OBJETOS GET ALL///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 export const getForm = async (req, res) => {
-    const id  = req.params
+    const id  = req.params.id
     let specific = 'NO'
     if(id.length>1){
         specific = 'YES'
@@ -38,7 +38,7 @@ export const getForm = async (req, res) => {
         })
     }
 
-}
+}//READY
 
 //QUERYS INSERT PARA OBJETOS//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 export const createForm = async (req, res) => {
@@ -83,7 +83,7 @@ export const createForm = async (req, res) => {
             message: "No se proporcionó información completa"
         })
     }
-}
+}//READY
 
 ///QUERYS UPDATE PARA OBJETOS/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 export const updateForm = async (req, res) => {
@@ -127,8 +127,34 @@ export const updateForm = async (req, res) => {
             message: "No se proporcionó información completa"
         })
     }
-}
+}//READY
 
 ///QUERYS DELETE PARA OBJETOS/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 export const deleteForm = async (req, res) => {
-}
+    const id = req.params.id
+
+    const pool = await getConnection()
+    await pool
+        .request()
+        .input('id', sql.VarChar(255), id)
+        .execute('del_form')
+        .then(
+            (result) => {
+                return res.status(result.returnValue).json({
+                    message: 'formulario deshabilitado'
+                })
+            },
+            (error) => {
+                console.log('Continuando ...')
+                return res.status(500).json({
+                    message: 'ha ocurrido un error al intentar deshabilitar el formulario'
+                })
+            }
+        )
+        .catch((error) => {
+            console.log('Continuando ...')
+            return res.status(500).json({
+                message: 'ha ocurrido un error al intentar deshabilitar el formulario'
+            })
+        })
+}//READY
