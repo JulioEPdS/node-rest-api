@@ -24,9 +24,9 @@ import fs from 'fs'
 
 /*SELECT ALL AVAILABLE EVENTS */
 export const queryEventos = async (req, res) => {
-    const id  = req.params
+    const id = req.params.id
     let specific = 'NO'
-    if(id.length>1){
+    if (id.length > 1) {
         specific = 'YES'
     }
     if (specific && id) {
@@ -134,15 +134,20 @@ export const queryLogin = async (req, res) => {
                         }, config.jwt_APIKey, {
                             expiresIn: "1h"
                         })//JWT SIGN
+                        
 
-                        res.status(result.returnValue).json({
+                        return res.status(200).json({
                             message: 'Credenciales verificadas',
+                            id: result.recordset[0].id,
                             token: token
                         })
                     }
-                    return res.status(401).json({
-                        msg: "no autorizado"
-                    })
+                    else {
+                        return res.status(401).json({
+                            msg: "no autorizado"
+                        })
+                    }
+
                 })
         }
         else {
@@ -388,22 +393,21 @@ export const queryValid = async (req, res) => {
 
 export const queryInscript = async (req, res) => {
     const {
-        participante,
-        email,
+        participante,        
         evento,
         respuesta
     } = req.body
     const id = uuidv4()
-    if (participante && email && evento && respuesta && id) {
+    if (participante && evento && respuesta && id) {
+        
+        
         try {
             const pool = await getConnection()
             await pool
-                .request()
-                .input("id", sql.VarChar(255), id)
-                .input("participante", sql.VarChar(255), participante)
-                .input("email", sql.VarChar(255), email)
+                .request()                
+                .input("participante", sql.VarChar(255), participante)                
                 .input("evento", sql.VarChar(255), evento)
-                .input("respuesta", sql.VarChar(100), respuesta)
+                .input("CSEDE", sql.VarChar(100), respuesta)
                 .execute('API_inscription')
                 .then(result => {
                     if (result.returnValue == 409) {
@@ -525,7 +529,7 @@ export const reqUpgrade = async (req, res) => {
             )
             rutasalida = './uploads/temporal/' + pass + '.jpg'
             await image.writeAsync(rutasalida)
-            
+
             enviaremail()
         }
         //PRINT THE IMAGE TO SEND WITH THE PASSWORD EMBEBED 
@@ -581,7 +585,7 @@ export const reqUpgrade = async (req, res) => {
                     return
                 })*/
 
-                
+
             })
 
         }

@@ -17,12 +17,13 @@ import checkPartAuth from '../middleware/check-part-auth'
 
 const router = Router()
 
-router.get('/eventos', queryEventos) //READY
+router.get('/eventos/:id', queryEventos) //READY
 
-router.get('/getBanner', sendBanner) //READY
+router.get('/getBanner/id', sendBanner) //READY
+
+
 
 router.post('/registro', queryRegistro)
-
 router.post('/signup', querySignup)
 
 //router.post('/validacion',queryValid)
@@ -30,7 +31,9 @@ router.post('/signup', querySignup)
 router.post('/inscripcion', queryInscript)
 
 
+//SECURITY LOGIN//////////////////////////////////
 router.post('/login', queryLogin)
+
 
 
 /*EN DESARROLLO */
