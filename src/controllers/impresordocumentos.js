@@ -147,9 +147,9 @@ export async function enviarDoc(req, res) {
 
 
 export async function crearDesdeBD(req, res) {
-    const id  = req.body.id
+    const id = req.params.id
     let config = []
-    let ruta = ''    
+    let ruta = ''
 
     if (id) {
         console.log('Iniciando proceso de impresión...')
@@ -165,16 +165,16 @@ export async function crearDesdeBD(req, res) {
                     if (result.rowsAffected > 0) {
                         let str = result.recordset[0].config
                         config = JSON.parse(str)
-                        ruta = result.recordset[0].base_route                        
+                        ruta = result.recordset[0].base_route
                         console.log('Se leyó configuración de documento...')
                         //return res.status(200).json(result.recordset)
                     }
-                    else if(result.rowsAffected === 0){
+                    else if (result.rowsAffected === 0) {
                         console.log('No se halló certificado en la base de datos...')
                         return res.status(404).json({ message: 'NOT FOUND' })
                         //return res.status(200).json(result)
                     }
-                    
+
                 })
 
         } catch (err) {
@@ -185,16 +185,18 @@ export async function crearDesdeBD(req, res) {
             })
 
         }
-        //const documentType = "RECONOCIMIENTO" //pudiendo ser de otro tipo  
-        const nombrePersona = "JULIO EMMANUEL PEREZ DE LOS SANTOS"
-        //const textoSecundario = "Por haber participado en el taller en linea"
-        const eventName = "NUEVO ETIQUETADO PARA PRODUCTOS ALIMENTICIOS NOM-051"
-        const dateAndPlace = "TUXTLA GUTIERREZ, CHIAPAS; DICIEMBRE 17 DE 2021"
+        //const documentType = "RECONOCIMIENTO" //pudiendo ser de otro tipo  MEJOR USADO DIRECTAMENTE ABAJO, REVISE
+        const nombrePersona = "NOMBRE DE LA PERSONA"
+        //const textoSecundario = "Por haber participado en el taller en linea" MEJOR USADO DIRECTAMENTE ABAJO, REVISE
+        const eventName = "NOMBRE DEL EVENTO AQUI"
+        const dateAndPlace = "TUXTLA GUTIERREZ, CHIAPAS; MMM DD DE YYYY"
+
 
         //SIEMPRE Y CUANDO HAYA CONFIG, EL DOCUMENTO EXISTE...
         //CREAR EL DOCUMENTO ACORDE A LA CONFIGURACION
         //const ruta = './uploads/constancias/Constancia.png' LA OBTENEMOS DESDE LA CONSULTA
         console.log(config)
+
         const image = await Jimp.read(ruta)
         const textBeforeTypeFont = await Jimp.loadFont(config?.textBeforeTypeFont || './fonts/LATO_21_GREY_BOLD.fnt')
         const documentTypeFont = await Jimp.loadFont(config?.documentTypeFont || './fonts/LATO_68_CAFE.fnt')
@@ -202,7 +204,7 @@ export async function crearDesdeBD(req, res) {
         const textoSecundarioFont = await Jimp.loadFont(config?.textoSecundarioFont || './fonts/LATO_30_GREY_LIGHT.fnt')
         const eventNameFont = await Jimp.loadFont(config?.eventNameFont || './fonts/LATO_30_GREY_BOLD.fnt')
         const dateAndPlaceFont = await Jimp.loadFont(config?.dateAndPlaceFont || './fonts/LATO_16_DARK_BOLD.fnt')
-        
+
 
         if (config?.textBeforeType === 'true') {
             //IMPRIME "OTORGA LA O EL"
@@ -211,7 +213,7 @@ export async function crearDesdeBD(req, res) {
                 parseInt(config?.textBeforeTypeX) || 78,//Posición en X px
                 parseInt(config?.textBeforeTypeY) || 231,//Posición en Y px
                 {
-                    text: config.textBeforeTypeContent,
+                    text: config?.textBeforeTypeContent,
                     alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER,
                     alignmentY: Jimp.VERTICAL_ALIGN_MIDDLE
                 },
@@ -228,7 +230,7 @@ export async function crearDesdeBD(req, res) {
                 parseInt(config?.documentTypeX) || 78,//Posición en X px
                 parseInt(config?.documentTypeY) || 261,//Posición en Y px
                 {
-                    text: config.documentTypeContent,
+                    text: config?.documentTypeContent,
                     alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER,
                     alignmentY: Jimp.VERTICAL_ALIGN_MIDDLE
                 },
@@ -245,7 +247,7 @@ export async function crearDesdeBD(req, res) {
             image.print(
                 nombrePersonaFont,
                 //AL EDITAR EL VALOR POR DEFECTO CONSIDERE EL INICIO DE LINEA DEL NOMBRE
-                parseInt(config?.nombrePersonaX) || 206, 
+                parseInt(config?.nombrePersonaX) || 206,
                 parseInt(config?.nombrePersonaY) || 374,
                 {
                     text: nombrePersona,
@@ -307,10 +309,10 @@ export async function crearDesdeBD(req, res) {
         }
 
         let rutasalida = './constancias/' + config.documentTypeContent + '-' + eventName + '-' + nombrePersona + '.png'
-        await image.writeAsync(rutasalida) 
-        .then((result)=>{return res.download(rutasalida)})
+        await image.writeAsync(rutasalida)
+            .then((result) => { return res.download(rutasalida) })
 
-        
+
 
     }
     else {
